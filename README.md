@@ -20,7 +20,7 @@ make install
 
 ```bash
 sudo apt update
-sudo apt install nlohmann-json3-dev.
+sudo apt install nlohmann-json3-dev
 ```
 
 -   **compilation:**
