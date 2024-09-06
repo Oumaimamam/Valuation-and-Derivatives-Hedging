@@ -2,12 +2,12 @@
 
 
 class MonteCarlo {
-    + option : Option 
-    + model : BlackScholesModel
-    + fixingDatesNumber : int N
-    + sampleNumber : int M
+    - option : Option 
+    - model : BlackScholesModel
+    - fixingDatesNumber : int N
+    - sampleNumber : int M
+    - getDates() : PnlVect* 
     + price(t)
-    + getDates() : PnlVect* 
     
     
 }
