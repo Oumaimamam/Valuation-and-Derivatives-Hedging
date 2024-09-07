@@ -1,17 +1,15 @@
 #include "monte_carlo.hpp"
 
-PnlVect *MonteCarlo::getDates() const
+void MonteCarlo::getDates(PnlVect *vect) const
 {
   int size = this->fixing_dates_number + 1;
-  PnlVect *vect_ti = pnl_vect_create(size);
+  pnl_vect_resize(vect, size);
   // Maturity
   double T = option->maturity;
   for (int k = 0; k < size; k++)
   {
-    vect_ti->array[k] = (k * T) / (this->fixing_dates_number);
+    vect->array[k] = (k * T) / (this->fixing_dates_number);
   }
-
-  return vect_ti;
 }
 
 MonteCarlo::MonteCarlo(Option *option, BlackScholesModel *model, int N, int M)

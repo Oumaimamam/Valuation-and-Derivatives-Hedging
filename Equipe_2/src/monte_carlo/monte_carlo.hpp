@@ -11,7 +11,7 @@ public:
     BlackScholesModel *model;
     int fixing_dates_number;
     int sample_number;
-    PnlVect *getDates() const;
+    void getDates(PnlVect *vect) const;
 
 public:
     MonteCarlo(Option *option, BlackScholesModel *model, int N, int M);
