@@ -2,18 +2,17 @@
 #define BLACK_SCHOLES_MODEL_HPP
 #include "pnl/pnl_matvect.h"
 #include "pnl/pnl_vector.h"
-class black_scholes_model
+class BlackScholesModel
 {
-    private:
-        double interest_rate;
-        PnlVect* volatility;
-        PnlVect* spots;
-        double correlation;
+private:
+    double interest_rate;
+    PnlVect *volatility;
+    PnlVect *spots;
+    double correlation;
 
-    public:
-        black_scholes_model();
-        ~black_scholes_model();
-        void asset();
-
+public:
+    BlackScholesModel(double rate, PnlVect *vol, PnlVect *spots, double corr);
+    ~BlackScholesModel();
+    void asset();
 };
 #endif
