@@ -9,11 +9,13 @@ public:
     PnlVect *volatility;
     PnlVect *spots;
     double correlation;
+    int model_size;
 
 public:
     BlackScholesModel();
     BlackScholesModel(double rate, PnlVect *vol, PnlVect *spots, double corr);
     ~BlackScholesModel();
     void asset();
+    void get_matrix_Cholesky_corr(PnlMat *matrix);
 };
 #endif

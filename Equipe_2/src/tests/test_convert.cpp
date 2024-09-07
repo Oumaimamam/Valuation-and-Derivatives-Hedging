@@ -42,6 +42,7 @@ TEST(ConvertTest, TestForDataAsianJSON)
     assert(monte_carlo->sample_number == 50000);
 
     file.close();
+    delete monte_carlo;
 }
 
 bool is_equals_array(double *ptr_arr_res, double *arr_expected, int size)

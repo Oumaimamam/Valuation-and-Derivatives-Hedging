@@ -17,7 +17,7 @@ TEST(MonteCarloTest, TestingGetDatesDataAsianJSON)
 
     MonteCarlo *monte_carlo = convert_json_to_monte_carlo(json);
     PnlVect *list_ti = pnl_vect_new();
-    monte_carlo->getDates(list_ti);
+    monte_carlo->get_all_dates(list_ti);
 
     EXPECT_TRUE(list_ti->size == 25);
     EXPECT_TRUE(list_ti->array[0] == 0.0);
@@ -25,4 +25,5 @@ TEST(MonteCarloTest, TestingGetDatesDataAsianJSON)
 
     file.close();
     pnl_vect_free(&list_ti);
+    delete monte_carlo;
 }

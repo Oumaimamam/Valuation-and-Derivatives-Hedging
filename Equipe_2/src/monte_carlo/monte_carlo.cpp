@@ -1,7 +1,14 @@
 #include "monte_carlo.hpp"
 
-void MonteCarlo::getDates(PnlVect *vect) const
+void MonteCarlo::get_all_dates(PnlVect *vect) const
 {
+  /*
+To use this function there are some steps to do :
+PnlVect* vect = pnl_vect_new();
+get_all_dates(vect);
+pnl_vect_free(&vect);
+
+*/
   int size = this->fixing_dates_number + 1;
   pnl_vect_resize(vect, size);
   // Maturity
