@@ -67,6 +67,13 @@ add_executable(test_compute_lastdate src/test_compute_lastdate.cpp)
 # )
 
 
+
+# ============================== executable pour les tests : ===================
+
+# Test 1 : 
+
+
+
 # Print compiler flags
 get_directory_property(DirDefs COMPILE_DEFINITIONS)
 message(STATUS "COMPILE_DEFINITIONS = ${DirDefs}")

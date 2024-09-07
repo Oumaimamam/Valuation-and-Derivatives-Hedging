@@ -11,6 +11,7 @@ private:
     double correlation;
 
 public:
+    BlackScholesModel();
     BlackScholesModel(double rate, PnlVect *vol, PnlVect *spots, double corr);
     ~BlackScholesModel();
     void asset();

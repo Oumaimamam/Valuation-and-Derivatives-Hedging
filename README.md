@@ -38,7 +38,7 @@ make
     -   Ouvrir le fichier `c_cpp_properties.json`
     -   Ajouter dans `includePath`: **`"relative/path/to/lib/pnl/build/include/"`**
 
-- **Ajouter un executable dans `CMakeLists.txt`:**
+-   **Ajouter un executable dans `CMakeLists.txt`:**
 
 ```Makefile
 add_executable(nomExecutable _liste_des_fichiers_cpp)
