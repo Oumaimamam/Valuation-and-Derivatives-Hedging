@@ -1,9 +1,12 @@
+#ifndef MONTE_CARLO_HPP
+#define MONTE_CARLO_HPP
+
 #include "../Option/option.hpp"
 #include "../black_scholes_model/black_scholes_model.hpp"
 #include "pnl/pnl_vector.h"
 class MonteCarlo
 {
-private:
+public:
     Option *option;
     BlackScholesModel *model;
     int fixing_dates_number;
@@ -15,3 +18,5 @@ public:
     ~MonteCarlo();
     void price(double t);
 };
+
+#endif

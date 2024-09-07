@@ -5,7 +5,7 @@ PnlVect *MonteCarlo::getDates() const
   int size = this->fixing_dates_number + 1;
   PnlVect *vect_ti = pnl_vect_create(size);
   // Maturity
-  double T;
+  double T = option->maturity;
   for (int k = 0; k < size; k++)
   {
     vect_ti->array[k] = (k * T) / (this->fixing_dates_number);

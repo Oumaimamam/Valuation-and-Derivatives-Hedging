@@ -1,8 +1,32 @@
 #include "convert.hpp"
 #include "../json_helper.hpp"
+#include <iostream>;
+#include "../Option/option_type.hpp"
+
 Option *convert_json_to_option(nlohmann::json json)
 {
-    return nullptr;
+    double T;
+    double K;
+    PnlVect *coeff;
+    double D;
+    std::string type_str;
+
+    json.at("maturity").get_to(T);
+    json.at("strike").get_to(K);
+    json.at("option size").get_to(D);
+    json.at("payoff coefficients").get_to(coeff);
+    if (coeff->size == 1 && D > 1)
+    {
+        pnl_vect_resize_from_scalar(coeff, D, GET(coeff, 0));
+    }
+    json.at("option type").get_to(type_str);
+
+    OptionType type = stringToOptionType(type_str);
+
+    // Option* option = new Option();
+    Option *option = Option::GetOption(T, K, type, D, coeff);
+
+    return option;
 }
 
 BlackScholesModel *convert_json_to_model(nlohmann::json json)

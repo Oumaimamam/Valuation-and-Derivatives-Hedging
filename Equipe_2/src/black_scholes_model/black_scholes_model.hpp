@@ -4,7 +4,7 @@
 #include "pnl/pnl_vector.h"
 class BlackScholesModel
 {
-private:
+public:
     double interest_rate;
     PnlVect *volatility;
     PnlVect *spots;

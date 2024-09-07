@@ -15,9 +15,5 @@ int main(int argc, char *argv[])
     fstream file(argv[1]);
     nlohmann::json json = nlohmann::json::parse(file);
 
-    Option option;
-
-    convert_json_to_option(&option, json);
-
     return 0;
 }
