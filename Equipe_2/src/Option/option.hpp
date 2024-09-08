@@ -16,7 +16,7 @@ public:
     PnlVect *payoff_coeffcients;
 
 public:
-    virtual void payOff(PnlMat *matrix) = 0;
+    virtual double payOff(PnlMat *matrix) = 0;
     Option(double T, double K, OptionType type, double D, PnlVect *coeff);
     Option(const Option &autre);
     virtual ~Option();
@@ -28,7 +28,7 @@ class OptionAsian : public Option
 
 public:
     OptionAsian(double T, double K, OptionType type, double D, PnlVect *coeff);
-    void payOff(PnlMat *matrix) override;
+    double payOff(PnlMat *matrix) override;
     ~OptionAsian() override;
 };
 
@@ -37,7 +37,7 @@ class OptionBasket : public Option
 
 public:
     OptionBasket(double T, double K, OptionType type, double D, PnlVect *coeff);
-    void payOff(PnlMat *matrix) override;
+    double payOff(PnlMat *matrix) override;
     ~OptionBasket() override;
 };
 
@@ -46,7 +46,7 @@ class OptionPerformance : public Option
 
 public:
     OptionPerformance(double T, double K, OptionType type, double D, PnlVect *coeff);
-    void payOff(PnlMat *matrix) override;
+    double payOff(PnlMat *matrix) override;
     ~OptionPerformance() override;
 };
 

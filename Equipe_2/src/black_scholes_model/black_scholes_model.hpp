@@ -9,11 +9,12 @@ public:
     PnlVect *volatility;
     PnlVect *spots;
     double correlation;
+    PnlMat *mat_asset ;
 
 public:
     BlackScholesModel();
     BlackScholesModel(double rate, PnlVect *vol, PnlVect *spots, double corr);
     ~BlackScholesModel();
-    void asset();
+    void asset(PnlVect *Dates);
 };
 #endif

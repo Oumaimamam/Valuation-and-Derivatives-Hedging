@@ -8,11 +8,12 @@ PnlVect *MonteCarlo::getDates() const
   double T = option->maturity;
   for (int k = 0; k < size; k++)
   {
-    vect_ti->array[k] = (k * T) / (this->fixing_dates_number);
+    pnl_vect_set(vect_ti, k, k*T/this->fixing_dates_number);
   }
 
   return vect_ti;
 }
+
 
 MonteCarlo::MonteCarlo(Option *option, BlackScholesModel *model, int N, int M)
     : option(option),
@@ -22,10 +23,14 @@ MonteCarlo::MonteCarlo(Option *option, BlackScholesModel *model, int N, int M)
 {
 }
 
-MonteCarlo::~MonteCarlo()
-{
-  delete model;
-  delete option;
+MonteCarlo::~MonteCarlo() {
+    // Libérer la mémoire si nécessaire
+    if (option != nullptr) {
+        delete option;
+    }
+    if (model != nullptr) {
+        delete model;
+    }
 }
 
 void MonteCarlo::price(double t)
@@ -38,4 +43,37 @@ void MonteCarlo::price(double t)
   for (int i = 0; i < this->sample_number; i++)
   {
   }
+}
+
+
+// Destructeur
+
+
+// Méthode privée pour obtenir les dates
+PnlVect* MonteCarlo::getDates() const {
+    PnlVect* Dates = pnl_vect_create(fixing_dates_number+1);
+    //pnl_vect_set(PnlVect ∗v, int i, double x) to set x in place i
+    for (int k=0, k<fixing_dates_number+1, k++)
+    {
+        pnl_vect_set(Dates, k, k*option.getMaturity()/fixing_dates_number);
+    }
+
+
+}
+
+// Méthode pour calculer le prix
+double MonteCarlo::price(double t) {
+    double r = model.interesetRate;
+    int T = option.maturity;
+    return exp(-r*T)*(1/sample_number)*sum();
+}
+
+double MonteCarlo::sum(){
+    double res = 0.0;
+    for(int j = 1, j<fixing_dates_number+1, j++)
+    {
+        pnlMat* vectSim = pnl_mat_create(1, fixing_dates_number+1);
+        res += option.payoff(asset(getDates()),vectSim);
+    }
+    return res/sample_number ;
 }
