@@ -1,3 +1,6 @@
+#ifndef MONTE_CARLO
+#define MONTE_CARLO
+
 #include "../Option/option.hpp"
 #include "../black_scholes_model/black_scholes_model.hpp"
 #include "pnl/pnl_vector.h"
@@ -16,3 +19,5 @@ public:
     // calculer le price
     double price(double t);
 };
+
+#endif

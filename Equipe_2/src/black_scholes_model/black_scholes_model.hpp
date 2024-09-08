@@ -11,7 +11,6 @@ public:
     PnlVect *volatility; // pnl_vect_free
     PnlVect *spots;      // pnl_vect_free
     double correlation;
-    PnlMat *mat_asset; // pnl_mat_free
     int model_size;
     PnlRng *rng; // pnl_rng_free(&rng)
 
