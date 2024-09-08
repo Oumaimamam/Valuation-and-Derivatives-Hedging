@@ -8,18 +8,18 @@ class BlackScholesModel
 {
 public:
     double interest_rate;
-    PnlVect *volatility; //pnl_vect_free
-    PnlVect *spots; //pnl_vect_free
+    PnlVect *volatility; // pnl_vect_free
+    PnlVect *spots;      // pnl_vect_free
     double correlation;
-    PnlMat *mat_asset ;  //pnl_mat_free
+    PnlMat *mat_asset; // pnl_mat_free
     int model_size;
-    PnlRng *rng;  //pnl_rng_free(&rng)
+    PnlRng *rng; // pnl_rng_free(&rng)
 
 public:
     BlackScholesModel();
     BlackScholesModel(double rate, PnlVect *vol, PnlVect *spots, double corr);
     ~BlackScholesModel();
-    void asset(PnlVect *Dates);
+    void asset(PnlVect *Dates, PnlMat *mat_asset);
     void get_matrix_Cholesky_corr(PnlMat *matrix);
 };
 #endif
