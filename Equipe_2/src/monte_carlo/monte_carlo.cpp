@@ -50,10 +50,10 @@ double MonteCarlo::price(double t)
     get_all_dates(dates);
 
     PnlMat *matrix = pnl_mat_create(this->option->option_size, this->fixing_dates_number + 1);
-    this->model->asset(dates, matrix);
 
     for (int i = 1; i < this->sample_number + 1; i++)
     {
+        this->model->asset(dates, matrix);
         v_0 += this->option->payOff(matrix);
     }
 

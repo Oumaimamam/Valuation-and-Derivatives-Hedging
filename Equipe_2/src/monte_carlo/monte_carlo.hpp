@@ -1,5 +1,5 @@
-#ifndef MONTE_CARLO
-#define MONTE_CARLO
+#ifndef MONTE_CARLO_HPP
+#define MONTE_CARLO_HPP
 
 #include "../Option/option.hpp"
 #include "../black_scholes_model/black_scholes_model.hpp"
