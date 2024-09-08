@@ -1,7 +1,10 @@
 #include "convert.hpp"
 #include "../json_helper.hpp"
-#include <iostream>;
+#include <iostream>
 #include "../Option/option_type.hpp"
+#include "../Option/option.hpp"
+#include "../black_scholes_model/black_scholes_model.hpp"
+#include "../monte_carlo/monte_carlo.hpp"
 
 Option *convert_json_to_option(nlohmann::json json)
 {

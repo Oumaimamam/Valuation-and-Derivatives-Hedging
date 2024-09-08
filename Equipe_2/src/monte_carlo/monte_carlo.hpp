@@ -3,16 +3,16 @@
 #include "pnl/pnl_vector.h"
 class MonteCarlo{
 private :
-    Option option;
-    BlackScholeModel model;
+    Option *option;
+    BlackScholesModel *model;
     int fixing_dates_number;
     int sample_number;
-    PnlVect *getDates() const;
+    void get_all_dates(PnlVect *vect) const;
 
 
 public :
     MonteCarlo();
     ~MonteCarlo();
     // calculer le price
-    void price(double t);
+    double price(double t);
 };

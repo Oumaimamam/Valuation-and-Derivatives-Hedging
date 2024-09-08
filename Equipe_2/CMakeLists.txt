@@ -52,6 +52,19 @@ pnl_add_postbuild(test_json_reader)
 
 add_executable(test_compute_lastdate src/test_compute_lastdate.cpp)
 
+
+# my_lib 
+# Utiliser GLOB pour inclure tous les fichiers source
+file(GLOB HELPER_FILE src/json_helper.cpp src/pcpd_helper.cpp)
+file(GLOB OPTION_FILES src/Option/*.cpp)
+file(GLOB BSM_FILES src/black_scholes_model/*.cpp)
+file(GLOB MONTCARLO_FILES src/monte_carlo/*.cpp)
+file(GLOB UTILS_FILES src/Utils/*.cpp)
+
+# Créer la bibliothèque avec tous les fichiers .cpp trouvés
+add_library(my_lib ${SRC_FILES} ${OPTION_FILES} ${BSM_FILES} ${MONTCARLO_FILES} ${UTILS_FILES} ${HELPER_FILE})
+
+
 # Pour compiler vos exécutables, compléter les lignes ci-dessous.
 
 # add_executable(price0 _liste_des_fichiers_cpp)
@@ -68,11 +81,82 @@ add_executable(test_compute_lastdate src/test_compute_lastdate.cpp)
 
 
 
-# ============================== executable pour les tests : ===================
+# ============================== executable pour les tests :GTEST ===================
+# Ajoute les sous-répertoires pour Google Test si installé depuis GitHub
+find_package(GTest REQUIRED)
+include_directories(${GTEST_INCLUDE_DIRS})
 
-# Test 1 : 
+
+# Test Convert : src/Utils/convert.cpp
+add_executable(test_convert src/tests/test_convert.cpp)
+target_link_libraries(test_convert
+    my_lib
+    ${PNL_LIBRARIES}
+    nlohmann_json::nlohmann_json
+    ${GTEST_LIBRARIES}
+    gtest_main
+    pthread
+)
 
 
+
+# Test Monte Carlo : src/monte_carlo/*.cpp
+add_executable(test_monte_carlo src/tests/test_monte_carlo.cpp)
+target_link_libraries(test_monte_carlo
+    my_lib
+    ${PNL_LIBRARIES}
+    nlohmann_json::nlohmann_json
+    ${GTEST_LIBRARIES}
+    gtest_main
+    pthread
+)
+
+# Test Option: src/option/*.cpp
+add_executable(test_option src/tests/test_option.cpp)
+target_link_libraries(test_option
+    my_lib
+    ${PNL_LIBRARIES}
+    nlohmann_json::nlohmann_json
+    ${GTEST_LIBRARIES}
+    gtest_main
+    pthread
+)
+
+
+# Test black_scholes_model : src/black_scholes_model/*.cpp
+add_executable(test_black_scholes_model src/tests/test_black_scholes_model.cpp)
+target_link_libraries(test_black_scholes_model
+    my_lib
+    ${PNL_LIBRARIES}
+    nlohmann_json::nlohmann_json
+    ${GTEST_LIBRARIES}
+    gtest_main
+    pthread
+)
+
+# Test Pricer : 
+add_executable(test_pricer src/tests/test_pricer.cpp)
+target_link_libraries(test_pricer
+    my_lib
+    ${PNL_LIBRARIES}
+    nlohmann_json::nlohmann_json
+    ${GTEST_LIBRARIES}
+    gtest_main
+    pthread
+)
+
+# Test hedge : 
+add_executable(test_hedge src/tests/test_hedge.cpp)
+target_link_libraries(test_hedge
+    my_lib
+    ${PNL_LIBRARIES}
+    nlohmann_json::nlohmann_json
+    ${GTEST_LIBRARIES}
+    gtest_main
+    pthread
+)
+
+# ========================================================== End Testing ==============================
 
 # Print compiler flags
 get_directory_property(DirDefs COMPILE_DEFINITIONS)

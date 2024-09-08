@@ -9,14 +9,30 @@ OptionPerformance::OptionPerformance(double T, double K, OptionType type, double
 
 double OptionPerformance::payOff(PnlMat *matrix)
 {
-    res = 0;
+    double res = 0;
+    int rows = matrix->m; // D
+    int cols = matrix ->n; //N+1
+
+    for(int j=1; j<cols; j++)
+    {
+        double sum1 = 0;
+        double sum2 = 0;
+        double lamda_d;
+        for(int d =0 ; d<rows;d++)
+        {
+            lamda_d = GET(payoff_coeffcients,d);
+            sum1 += lamda_d*pnl_mat_get(matrix,d,j);
+            sum2 += lamda_d*pnl_mat_get(matrix,d,j-1);
+        }
+
+        res += sum1/sum2 -1;
+
+    }
 
 
-
-
-    res+=1;
-    double zero = 0;
-    return std::max(zero,res)
+    double zero = 0.0;
+    res = 1 + std::max(res , zero);
+    return res;
 }
 
 OptionPerformance::~OptionPerformance() {}

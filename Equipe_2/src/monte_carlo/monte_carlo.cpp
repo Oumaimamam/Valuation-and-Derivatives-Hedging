@@ -1,17 +1,23 @@
 #include "monte_carlo.hpp"
 
-PnlVect *MonteCarlo::getDates() const
+void MonteCarlo::get_all_dates(PnlVect *vect) const
 {
+  /*
+To use this function there are some steps to do :
+PnlVect* vect = pnl_vect_new();
+get_all_dates(vect);
+pnl_vect_free(&vect);
+
+*/
   int size = this->fixing_dates_number + 1;
-  PnlVect *vect_ti = pnl_vect_create(size);
+  pnl_vect_resize(vect, size);
   // Maturity
   double T = option->maturity;
   for (int k = 0; k < size; k++)
   {
-    pnl_vect_set(vect_ti, k, k*T/this->fixing_dates_number);
-  }
+    pnl_vect_set(vect, k, k*T/this->fixing_dates_number);
 
-  return vect_ti;
+  }
 }
 
 
@@ -33,16 +39,27 @@ MonteCarlo::~MonteCarlo() {
     }
 }
 
-void MonteCarlo::price(double t)
+double MonteCarlo::price(double t)
 {
-  // calcul du prix à l'instat t = 0 et pour d = 1
-  double v_0 = 0.0;
+    // calcul du prix à l'instat t = 0 et pour d = 1
+    double v_0 = 0.0;
 
-  PnlVect *vect_phi_j;
+    PnlVect *vect_phi_j;
+    PnlVect *Dates;
+    get_all_dates(Dates);
 
-  for (int i = 0; i < this->sample_number; i++)
-  {
-  }
+    PnlMat* mat = this->model.asset(Dates);
+
+    for (int i = 1 ; i < this->sample_number + 1; i++)
+    {
+    v_0 += this->option.payOff(mat);
+    }
+
+
+    pnl_vect_free(&vect);
+    double r = this->model.interest_rate;
+    int T = this->option.maturity;
+    return exp(-r*T) * (1/this->sample_number) * v_0;
 }
 
 

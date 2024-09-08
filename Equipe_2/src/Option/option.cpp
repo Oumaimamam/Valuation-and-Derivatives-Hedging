@@ -1,4 +1,5 @@
 #include "option.hpp"
+#include <cmath>
 
 Option::Option(double T, double K, OptionType type, double D, PnlVect *coeff)
     : maturity(T),
@@ -25,21 +26,22 @@ Option::~Option()
 
 Option *Option::GetOption(double T, double K, OptionType type, double D, PnlVect *coeff)
 {
+    Option *option = nullptr;
     switch (type)
     {
     case OptionType::Basket:
-        Option *option = new OptionBasket(T, K, type, D, coeff);
-        return option;
-
+        option = new OptionBasket(T, K, type, D, coeff);
+        break;
     case OptionType::Asian:
-        Option *option = new OptionAsian(T, K, type, D, coeff);
-        return option;
-
+        option = new OptionAsian(T, K, type, D, coeff);
+        break;
     case OptionType::Performance:
-        Option *option = new OptionPerformance(T, K, type, D, coeff);
-        return option;
-
+        option = new OptionPerformance(T, K, type, D, coeff);
+        break;
     default:
         throw std::invalid_argument("Type d'option non valide : " + type);
+        break;
     }
+
+    return option;
 }
