@@ -8,11 +8,10 @@ OptionBasket::OptionBasket(double T, double K, OptionType type, double D, PnlVec
 
 double OptionBasket::payOff(PnlMat *matrix)
 {
-    double res = 0;
-    int rows = matrix->m;
+    double res = 0.0;
     int cols = matrix->n;
 
-    for (int d = 0; d < rows; d++)
+    for (int d = 0; d < this->option_size; d++)
     {
         double lamda_d = GET(payoff_coeffcients, d);
         double S_t_d = pnl_mat_get(matrix, d, cols - 1);

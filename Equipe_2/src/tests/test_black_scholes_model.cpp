@@ -1,11 +1,13 @@
 #include <gtest/gtest.h>
+#include "../monte_carlo/monte_carlo.hpp"
+#include "../Utils/convert.hpp"
 
-TEST(ExampleTest, HandlesTrueAssertions)
+TEST(BlackScholesModel, TestAssetCall)
 {
-    EXPECT_TRUE(true);
+    MonteCarlo* monte_carlo = convert_json_to_monte_carlo("../../data/call/call.json");
+
+    BlackScholesModel* model = monte_carlo->model;
+
 }
 
-TEST(ExampleTest, HandlesFalseAssertions)
-{
-    EXPECT_FALSE(false);
-}
+

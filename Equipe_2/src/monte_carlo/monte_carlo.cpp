@@ -49,12 +49,14 @@ double MonteCarlo::price(double t)
     PnlVect *dates = pnl_vect_new();
     get_all_dates(dates);
 
-    PnlMat *matrix = pnl_mat_create(this->option->option_size, this->fixing_dates_number + 1);
+
+    PnlMat *matrix = pnl_mat_create(this->option->option_size, dates->size);
 
     for (int i = 1; i < this->sample_number + 1; i++)
     {
         this->model->asset(dates, matrix);
         v_0 += this->option->payOff(matrix);
+
     }
 
     double r = this->model->interest_rate;
