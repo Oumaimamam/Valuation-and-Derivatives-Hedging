@@ -31,7 +31,8 @@ void BlackScholesModel::asset(PnlVect *Dates, PnlMat *mat_asset)
     int D = spots->size;
     // mat_asset = pnl_mat_create(D, n);
     // PnlVect *spots = St0
-    PnlVect *col = spots;
+    PnlVect *col = pnl_vect_new();
+    pnl_vect_clone(col , spots);
 
     // remplir la prémière colone de la matrice par St0
     pnl_mat_set_col(mat_asset,spots,0);
@@ -64,11 +65,14 @@ void BlackScholesModel::asset(PnlVect *Dates, PnlMat *mat_asset)
             double x = s_t_i * exp((r - pow(sigma_d, 2)/2) * (t_j - t_j_1) + sigma_d * sqrt(t_j - t_j_1) * L_d * G_i);
             pnl_vect_set(col, d, x);
             // col =St_i_1
+            // pnl_mat_set(mat_asset , d , j , x);
         }
         pnl_mat_set_col(mat_asset,col,j);
         //free
-        pnl_vect_free(&col);
     }
+
+    pnl_vect_free(&col);
+
 }
 
 void BlackScholesModel::get_matrix_Cholesky_corr(PnlMat *matrix_chol)
