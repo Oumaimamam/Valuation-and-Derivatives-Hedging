@@ -40,6 +40,7 @@ BlackScholesModel *convert_json_to_model(nlohmann::json json)
     PnlVect *vols;
     PnlVect *spots;
     double corr;
+    double H ; 
 
     json.at("interest rate").get_to(r);
     json.at("option size").get_to(size);
@@ -54,8 +55,9 @@ BlackScholesModel *convert_json_to_model(nlohmann::json json)
         pnl_vect_resize_from_scalar(spots, size, GET(spots, 0));
     }
     json.at("correlation").get_to(corr);
+    json.at("hedging dates number").get_to(H);
 
-    BlackScholesModel *model = new BlackScholesModel(r, vols, spots, corr);
+    BlackScholesModel *model = new BlackScholesModel(r, vols, spots, corr , H);
 
     return model;
 }

@@ -1,6 +1,7 @@
 #include "black_scholes_model.hpp"
 #include <cmath>
 #include <random>
+#include "../Utils/utils.hpp"
 
 BlackScholesModel::BlackScholesModel()
 {
@@ -8,11 +9,12 @@ BlackScholesModel::BlackScholesModel()
     this->spots = pnl_vect_new();
 }
 
-BlackScholesModel::BlackScholesModel(double rate, PnlVect *vol, PnlVect *spots, double corr)
+BlackScholesModel::BlackScholesModel(double rate, PnlVect *vol, PnlVect *spots, double corr , double H)
     : interest_rate(rate),
       volatility(vol),
       spots(spots),
-      correlation(corr)
+      correlation(corr), 
+      hedging_dates_number(H)
 {
     this->model_size = spots->size;
 }
@@ -24,7 +26,7 @@ BlackScholesModel::~BlackScholesModel()
     pnl_rng_free(&rng);
 }
 
-void BlackScholesModel::asset(PnlVect *Dates, PnlMat *mat_asset)
+void BlackScholesModel::asset(PnlVect* spots , PnlVect *Dates, PnlMat *mat_asset)
 {
     // n = N+1
     int n = Dates->size;
@@ -103,3 +105,4 @@ void BlackScholesModel::get_matrix_Cholesky_corr(PnlMat *matrix_chol)
 
     pnl_mat_chol(matrix_chol);
 }
+
