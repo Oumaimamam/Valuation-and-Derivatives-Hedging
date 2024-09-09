@@ -6,7 +6,7 @@
 TEST(MonteCarloTest, TestingPriceCall)
 {
     MonteCarlo *monte_carlo = convert_json_to_monte_carlo("../../data/call/call.json");
-    double price0 = monte_carlo->price(0);
+    double price0 = monte_carlo->price(0.006703);
     std::cout << "price0 = " << price0 << std::endl;
 }
 
