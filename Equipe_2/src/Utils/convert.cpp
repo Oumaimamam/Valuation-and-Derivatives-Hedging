@@ -1,6 +1,7 @@
 #include "convert.hpp"
 #include "../json_helper.hpp"
 #include <iostream>
+#include <fstream>
 #include "../Option/option_type.hpp"
 #include "../Option/option.hpp"
 #include "../black_scholes_model/black_scholes_model.hpp"
@@ -59,10 +60,18 @@ BlackScholesModel *convert_json_to_model(nlohmann::json json)
     return model;
 }
 
-MonteCarlo *convert_json_to_monte_carlo(nlohmann::json json)
+MonteCarlo *convert_json_to_monte_carlo(std::string file_path)
 {
     int N;
     int M;
+
+    std::ifstream file(file_path);
+    if (!file.is_open())
+    {
+        std::cerr << "Error opening file" << std::endl;
+        exit(1);
+    }
+    nlohmann::json json = nlohmann::json::parse(file);
 
     json.at("fixing dates number").get_to(N);
     json.at("sample number").get_to(M);
@@ -71,6 +80,8 @@ MonteCarlo *convert_json_to_monte_carlo(nlohmann::json json)
     Option *option = convert_json_to_option(json);
 
     MonteCarlo *monte_carlo = new MonteCarlo(option, model, N, M);
+
+    file.close();
 
     return monte_carlo;
 }

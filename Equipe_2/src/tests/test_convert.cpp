@@ -9,15 +9,8 @@ bool is_equals_array(double *ptr_arr_res, double *arr_expected, int size);
 
 TEST(ConvertTest, TestForDataAsianJSON)
 {
-    std::ifstream file("../../data/asian/asian.json");
-    if (!file.is_open())
-    {
-        std::cerr << "Error opening file" << std::endl;
-        exit(1);
-    }
-    nlohmann::json json = nlohmann::json::parse(file);
 
-    MonteCarlo *monte_carlo = convert_json_to_monte_carlo(json);
+    MonteCarlo *monte_carlo = convert_json_to_monte_carlo("../../data/asian/asian.json");
 
     assert(monte_carlo->option->option_size == 2);
     EXPECT_TRUE(monte_carlo->option->strike == 100.0);
@@ -41,7 +34,6 @@ TEST(ConvertTest, TestForDataAsianJSON)
     EXPECT_TRUE(monte_carlo->fixing_dates_number == 24);
     assert(monte_carlo->sample_number == 50000);
 
-    file.close();
     delete monte_carlo;
 }
 
