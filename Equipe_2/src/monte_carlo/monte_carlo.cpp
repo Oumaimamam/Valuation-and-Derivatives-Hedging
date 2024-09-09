@@ -1,5 +1,6 @@
 #include "monte_carlo.hpp"
 #include <cmath>
+#include "../Utils/convert.hpp"
 
 void MonteCarlo::get_all_dates(PnlVect *vect) const
 {
@@ -52,8 +53,10 @@ double MonteCarlo::price(double t)
 
     PnlMat *matrix = pnl_mat_create(this->option->option_size, dates->size);
 
+
     for (int i = 1; i < this->sample_number + 1; i++)
     {
+        PnlMat* matrix_sim = pnl_mat_create(2 , 3);
         this->model->asset(dates, matrix);
         v_0 += this->option->payOff(matrix);
 
@@ -66,7 +69,7 @@ double MonteCarlo::price(double t)
     pnl_vect_free(&dates);
     pnl_mat_free(&matrix);
 
-    return std::exp(-r * T) * (1 / this->sample_number) * v_0;
+    return std::exp(-r * (T - t)) * (1 / this->sample_number) * v_0;
 }
 
 // Destructeur

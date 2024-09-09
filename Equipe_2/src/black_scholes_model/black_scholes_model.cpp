@@ -41,6 +41,13 @@ void BlackScholesModel::asset(PnlVect *Dates, PnlMat *mat_asset)
     rng = pnl_rng_create(PNL_RNG_MERSENNE);
     pnl_rng_sseed(rng, time(NULL));
 
+    // matrice L : 
+    PnlMat* L = pnl_mat_new();
+    get_matrix_Cholesky_corr(L);
+
+    PnlVect* L_d = pnl_vect_create(D);
+    PnlVect* G = pnl_vect_create(D);
+
     // remplir la matrice mat_asset
     for (int j = 1; j < n; j++)
     {
@@ -55,14 +62,15 @@ void BlackScholesModel::asset(PnlVect *Dates, PnlMat *mat_asset)
             double t_j = pnl_vect_get(Dates, j);
             double t_j_1 = pnl_vect_get(Dates, j - 1);
 
-            // vu u'on travaille avec D= 1, alors on a :
-            double L_d = 1;
+
+            pnl_mat_get_row(L_d , L , d );
+
             // simulier une varibale aléatoire centré reduite dans le cas D=1
 
             // Générer une variable aléatoire centrée réduite
-            double G_i = pnl_rng_normal(rng); // Appeler la fonction pour générer une valeur
+            pnl_vect_rng_normal(G , D , rng); // Appeler la fonction pour générer une valeur
 
-            double x = s_t_i * exp((r - pow(sigma_d, 2)/2) * (t_j - t_j_1) + sigma_d * sqrt(t_j - t_j_1) * L_d * G_i);
+            double x = s_t_i * exp((r - pow(sigma_d, 2)/2) * (t_j - t_j_1) + sigma_d * sqrt(t_j - t_j_1) * pnl_vect_scalar_prod(L_d ,G));
             pnl_vect_set(col, d, x);
             // col =St_i_1
             // pnl_mat_set(mat_asset , d , j , x);
@@ -72,6 +80,9 @@ void BlackScholesModel::asset(PnlVect *Dates, PnlMat *mat_asset)
     }
 
     pnl_vect_free(&col);
+    pnl_mat_free(&L);
+    pnl_vect_free(&L_d);
+    pnl_vect_free(&G);
 
 }
 
