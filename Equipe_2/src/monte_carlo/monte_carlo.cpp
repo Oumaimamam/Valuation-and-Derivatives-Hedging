@@ -1,7 +1,9 @@
 #include "monte_carlo.hpp"
 #include <cmath>
+#include "../Utils/convert.hpp"
+#include "../Utils/utils.hpp"
 
-void MonteCarlo::get_all_dates(PnlVect *vect) const
+void MonteCarlo::get_all_dates(PnlVect *vect, double t, int i) const
 {
     /*
   To use this function there are some steps to do :
@@ -10,21 +12,24 @@ void MonteCarlo::get_all_dates(PnlVect *vect) const
   pnl_vect_free(&vect);
 
   */
-    int size = this->fixing_dates_number + 1;
+    int size = this->fixing_dates_number + 1 - i;
     pnl_vect_resize(vect, size);
-    // Maturity
     double T = option->maturity;
-    for (int k = 0; k < size; k++)
+
+    pnl_vect_set(vect, 0, 0);
+    for (int k = 1; k < size; k++)
     {
-        pnl_vect_set(vect, k, k * T / this->fixing_dates_number);
+        double u_k = ((k + i) * T / this->fixing_dates_number) - t;
+        pnl_vect_set(vect, k, u_k);
     }
 }
 
-MonteCarlo::MonteCarlo(Option *option, BlackScholesModel *model, int N, int M)
+MonteCarlo::MonteCarlo(Option *option, BlackScholesModel *model, int N, int M , PnlMat* data )
     : option(option),
       model(model),
       fixing_dates_number(N),
-      sample_number(M)
+      sample_number(M),
+      market_data(data)
 {
 }
 
@@ -39,6 +44,10 @@ MonteCarlo::~MonteCarlo()
     {
         delete model;
     }
+
+    if(market_data != nullptr) {
+        pnl_mat_free(&market_data);
+    }
 }
 
 double MonteCarlo::price(double t)
@@ -46,17 +55,57 @@ double MonteCarlo::price(double t)
     // calcul du prix à l'instat t = 0 et pour d = 1
     double v_0 = 0.0;
 
+    int D = this->option->option_size;
+
+    int index = compute_last_index(t, this->option->maturity, this->fixing_dates_number);
+
     PnlVect *dates = pnl_vect_new();
-    get_all_dates(dates);
+    get_all_dates(dates, t, index);
+
+    PnlVect *s_t = pnl_vect_new();
+    PnlMat *cots = pnl_mat_new();
+
+    PnlVect *spots = pnl_vect_create(D);
+
+    if (t == 0.0)
+    {
+        pnl_vect_clone(spots, this->model->spots);
+
+    }
+    else
+    {
+        pnl_vect_set_all(spots, 1.0);
+
+    }
+    get_cotations(t, cots, s_t);
 
 
-    PnlMat *matrix = pnl_mat_create(this->option->option_size, dates->size);
+
+    PnlMat *matrix = pnl_mat_create(D, this->fixing_dates_number + 1);
+
+    PnlMat *matrix_sim = pnl_mat_create(D, this->fixing_dates_number - index);
+
+    PnlVect *col = pnl_vect_create(D);
 
     for (int i = 1; i < this->sample_number + 1; i++)
     {
-        this->model->asset(dates, matrix);
-        v_0 += this->option->payOff(matrix);
+        this->model->asset(spots, dates, matrix_sim);
 
+        if(t != 0.0) {
+
+            for (int j = 0; j < this->fixing_dates_number - index; j++)
+            {
+                pnl_mat_get_col(col, matrix_sim, j);
+                pnl_vect_mult_vect_term(col, s_t); 
+                pnl_mat_set_col(matrix_sim, col, j);
+            }
+
+        }
+
+        pnl_mat_set_subblock(matrix, cots, 0, 0);
+        pnl_mat_set_subblock(matrix, matrix_sim, 0, index + 1);
+
+        v_0 += this->option->payOff(matrix);
     }
 
     double r = this->model->interest_rate;
@@ -64,39 +113,60 @@ double MonteCarlo::price(double t)
 
     // free :
     pnl_vect_free(&dates);
+    pnl_vect_free(&col);
     pnl_mat_free(&matrix);
+    pnl_vect_free(&s_t);
+    pnl_mat_free(&cots);
+    pnl_vect_free(&spots);
+    pnl_mat_free(&matrix_sim);
 
-    return std::exp(-r * T) * (1 / this->sample_number) * v_0;
+
+    
+    double  price_t = std::exp(-r * (T - t))*(1.0 / (double)this->sample_number) * v_0  ; 
+
+    return price_t ;
 }
 
-// Destructeur
+void MonteCarlo::get_cotations(double t, PnlMat *cots, PnlVect *s_t)
+{
+    /*
+    To use this function there are some steps to do :
 
-// Méthode privée pour obtenir les dates
-// PnlVect *MonteCarlo::getDates() const
-// {
-//     PnlVect *Dates = pnl_vect_create(fixing_dates_number + 1);
-//     // pnl_vect_set(PnlVect ∗v, int i, double x) to set x in place i
-//     for (int k = 0, k < fixing_dates_number + 1, k++)
-//     {
-//         pnl_vect_set(Dates, k, k * option.getMaturity() / fixing_dates_number);
-//     }
-// }
+    Step 1 :
+    PnlVect* s_t = pnl_vect_new();
+    PnlMat* cots = pnl_mat_new();
 
-// Méthode pour calculer le prix
-// double MonteCarlo::price(double t)
-// {
-//     double r = model.interesetRate;
-//     int T = option.maturity;
-//     return exp(-r * T) * (1 / sample_number) * sum();
-// }
+    get_cotations(t , cots , s_t);
 
-// double MonteCarlo::sum()
-// {
-//     double res = 0.0;
-//     for (int j = 1, j < fixing_dates_number + 1, j++)
-//     {
-//         pnlMat *vectSim = pnl_mat_create(1, fixing_dates_number + 1);
-//         res += option.payoff(asset(getDates()), vectSim);
-//     }
-//     return res / sample_number;
-// }
+    pnl_vect_free(&s_t);
+    pnl_mat_free(&cots);
+  */
+
+
+    if(market_data == NULL) {
+        throw std::invalid_argument("argument data.txt non fourni");
+        exit(1);
+    }
+
+    int H = this->model->hedging_dates_number;
+    int N = this->fixing_dates_number;
+    double T = this->option->maturity;
+    int D = this->option->option_size;
+
+    int i = compute_last_index(t, T, N);
+
+    pnl_mat_resize(cots, D, i + 1);
+
+    PnlVect *col = pnl_vect_create(D);
+
+    for (int j = 0; j < i + 1; j++)
+    {
+        pnl_mat_get_row(col, this->market_data, j * H / N);
+        pnl_mat_set_col(cots, col, j);
+    }
+
+    int index_t = t * H / T;
+    pnl_mat_get_row(s_t, this->market_data, index_t);
+
+    pnl_vect_free(&col);
+}

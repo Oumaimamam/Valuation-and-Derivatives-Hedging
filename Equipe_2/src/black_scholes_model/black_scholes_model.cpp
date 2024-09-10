@@ -1,6 +1,7 @@
 #include "black_scholes_model.hpp"
 #include <cmath>
 #include <random>
+#include "../Utils/utils.hpp"
 
 BlackScholesModel::BlackScholesModel()
 {
@@ -8,13 +9,16 @@ BlackScholesModel::BlackScholesModel()
     this->spots = pnl_vect_new();
 }
 
-BlackScholesModel::BlackScholesModel(double rate, PnlVect *vol, PnlVect *spots, double corr)
+BlackScholesModel::BlackScholesModel(double rate, PnlVect *vol, PnlVect *spots, double corr, double H)
     : interest_rate(rate),
       volatility(vol),
       spots(spots),
-      correlation(corr)
+      correlation(corr),
+      hedging_dates_number(H)
 {
     this->model_size = spots->size;
+    rng = pnl_rng_create(PNL_RNG_MERSENNE);
+    pnl_rng_sseed(rng, time(NULL));
 }
 
 BlackScholesModel::~BlackScholesModel()
@@ -24,25 +28,32 @@ BlackScholesModel::~BlackScholesModel()
     pnl_rng_free(&rng);
 }
 
-void BlackScholesModel::asset(PnlVect *Dates, PnlMat *mat_asset)
+void BlackScholesModel::asset(PnlVect *spots, PnlVect *Dates, PnlMat *mat_asset)
 {
     // n = N+1
-    int n = Dates->size;
+    int n = mat_asset->n;
     int D = spots->size;
     // mat_asset = pnl_mat_create(D, n);
     // PnlVect *spots = St0
     PnlVect *col = pnl_vect_new();
-    pnl_vect_clone(col , spots);
+    pnl_vect_clone(col, spots);
 
     // remplir la prémière colone de la matrice par St0
-    pnl_mat_set_col(mat_asset,spots,0);
+    // pnl_mat_set_col(mat_asset, spots, 0);
 
     // Initialiser le générateur de nombres aléatoires
-    rng = pnl_rng_create(PNL_RNG_MERSENNE);
-    pnl_rng_sseed(rng, time(NULL));
+    // rng = pnl_rng_create(PNL_RNG_MERSENNE);
+    // pnl_rng_sseed(rng, 0);
+
+    // matrice L :
+    PnlMat *L = pnl_mat_new();
+    get_matrix_Cholesky_corr(L);
+
+    PnlVect *L_d = pnl_vect_create(D);
+    PnlVect *G = pnl_vect_create(D);
 
     // remplir la matrice mat_asset
-    for (int j = 1; j < n; j++)
+    for (int j = 0; j < n; j++)
     {
         // calcul de Stj,d
         // col = St_i
@@ -53,26 +64,29 @@ void BlackScholesModel::asset(PnlVect *Dates, PnlMat *mat_asset)
             double r = this->interest_rate;
             double sigma_d = pnl_vect_get(this->volatility, d);
             double t_j = pnl_vect_get(Dates, j);
-            double t_j_1 = pnl_vect_get(Dates, j - 1);
+            double t_j_1 = pnl_vect_get(Dates, j + 1);
 
-            // vu u'on travaille avec D= 1, alors on a :
-            double L_d = 1;
+            pnl_mat_get_row(L_d, L, d);
+
             // simulier une varibale aléatoire centré reduite dans le cas D=1
 
             // Générer une variable aléatoire centrée réduite
-            double G_i = pnl_rng_normal(rng); // Appeler la fonction pour générer une valeur
-
-            double x = s_t_i * exp((r - pow(sigma_d, 2)/2) * (t_j - t_j_1) + sigma_d * sqrt(t_j - t_j_1) * L_d * G_i);
+            pnl_vect_rng_normal(G, D, rng);
+             // Appeler la fonction pour générer une valeur
+            // pnl_vect_print_asrow(G);
+            double x = s_t_i * exp((r - pow(sigma_d, 2) / 2) * (t_j_1 - t_j) + sigma_d * sqrt(t_j_1 - t_j) * pnl_vect_scalar_prod(L_d, G));
             pnl_vect_set(col, d, x);
             // col =St_i_1
             // pnl_mat_set(mat_asset , d , j , x);
         }
-        pnl_mat_set_col(mat_asset,col,j);
-        //free
+        pnl_mat_set_col(mat_asset, col, j);
+        // free
     }
 
     pnl_vect_free(&col);
-
+    pnl_mat_free(&L);
+    pnl_vect_free(&L_d);
+    pnl_vect_free(&G);
 }
 
 void BlackScholesModel::get_matrix_Cholesky_corr(PnlMat *matrix_chol)

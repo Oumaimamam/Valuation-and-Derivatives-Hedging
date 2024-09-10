@@ -7,23 +7,16 @@
 
 TEST(MonteCarloTest, TestingGetDatesDataAsianJSON)
 {
-    std::ifstream file("../../data/asian/asian.json");
-    if (!file.is_open())
-    {
-        std::cerr << "Error opening file" << std::endl;
-        exit(1);
-    }
-    nlohmann::json json = nlohmann::json::parse(file);
 
-    MonteCarlo *monte_carlo = convert_json_to_monte_carlo(json);
+    MonteCarlo *monte_carlo = convert_json_to_monte_carlo("../../data/asian/asian.json");
     PnlVect *list_ti = pnl_vect_new();
-    monte_carlo->get_all_dates(list_ti);
+    monte_carlo->get_all_dates(list_ti, 0, 0);
 
     EXPECT_TRUE(list_ti->size == 25);
     EXPECT_TRUE(list_ti->array[0] == 0.0);
+    EXPECT_TRUE(list_ti->array[2] == 0.125);
     EXPECT_TRUE(list_ti->array[24] == 1.5);
 
-    file.close();
     pnl_vect_free(&list_ti);
     delete monte_carlo;
 }
