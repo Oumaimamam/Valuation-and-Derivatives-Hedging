@@ -28,7 +28,7 @@ double OptionAsian::payOff(PnlMat *matrix)
         res += lamda_d*res2;
     }
 
-    res = res/(rows) - this->strike;
+    res = res/(cols) - this->strike;
     double zero = 0.0;
     return std::max(zero,res);
 }

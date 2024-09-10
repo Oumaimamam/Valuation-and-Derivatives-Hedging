@@ -14,9 +14,9 @@ double OptionBasket::payOff(PnlMat *matrix)
     for (int d = 0; d < this->option_size; d++)
     {
         double lamda_d = GET(payoff_coeffcients, d);
-        double S_t_d = pnl_mat_get(matrix, d, cols - 1);
+        double S_T_d = pnl_mat_get(matrix, d, cols - 1);
 
-        res += lamda_d * S_t_d;
+        res += lamda_d * S_T_d;
     }
     res -= this->strike;
 
