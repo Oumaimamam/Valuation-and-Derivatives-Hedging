@@ -2,11 +2,14 @@
 
 
 class MonteCarlo {
-    - option : Option 
-    - model : BlackScholesModel
-    - fixingDatesNumber : int N
-    - sampleNumber : int M
-    - getDates() : PnlVect* 
+    + option : Option 
+    + model : BlackScholesModel
+    + fixingDatesNumber : int N
+    + sampleNumber : int M
+    + getDates() : PnlVect* 
+    + market_data : PnlMat* 
+    + fdStep : int h 
+    + hedging_dates_number : int H 
     + price(t)
     
     
@@ -51,6 +54,8 @@ class BlackScholesModel {
     + volatility : PnlVect* 
     + spot : PnlVect*
     + correlation : double 
+    + model_size : int 
+    + rng : PnlRng*
     + void asset(PnlVect listTi , PnlMat* vectSimulation)
 }
 
