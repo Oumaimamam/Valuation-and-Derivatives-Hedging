@@ -158,6 +158,18 @@ target_link_libraries(test_hedge
 
 # ========================================================== End Testing ==============================
 
+# price0: 
+add_executable(price0 src/price.cpp)
+target_link_libraries(price0
+    my_lib
+    ${PNL_LIBRARIES}
+    nlohmann_json::nlohmann_json
+    ${GTEST_LIBRARIES}
+    gtest_main
+    pthread
+)
+
+
 # Print compiler flags
 get_directory_property(DirDefs COMPILE_DEFINITIONS)
 message(STATUS "COMPILE_DEFINITIONS = ${DirDefs}")

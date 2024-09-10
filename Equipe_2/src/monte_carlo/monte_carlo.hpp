@@ -13,18 +13,17 @@ public:
     BlackScholesModel *model;
     int fixing_dates_number;
     int sample_number;
-    PnlMat* market_data ; 
-    // PricingResults res_price ;
-    // HedgingResults  res_hedge ; 
+    double fd_step;
+    PnlMat *market_data;
 
-    void get_all_dates(PnlVect *vect , double t , int i ) const;
+    void get_all_dates(PnlVect *vect, double t, int i) const;
 
 public:
-    MonteCarlo(Option *option, BlackScholesModel *model, int N, int M , PnlMat* data );
+    MonteCarlo(Option *option, BlackScholesModel *model, int N, int M, PnlMat *data, double h);
     ~MonteCarlo();
     // calculer le price
-    double price(double t);
-    void get_cotations(double t, PnlMat *cots ,  PnlVect* s_t);
+    void price(double t, double &price, double &price_std);
+    void get_cotations(double t, PnlMat *cots, PnlVect *s_t);
 };
 
 #endif
