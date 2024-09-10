@@ -14,6 +14,7 @@ public:
     int fixing_dates_number;
     int sample_number;
     PnlMat* market_data ; 
+    double fd_step;
     // PricingResults res_price ;
     // HedgingResults  res_hedge ; 
 
@@ -25,6 +26,9 @@ public:
     // calculer le price
     double price(double t);
     void get_cotations(double t, PnlMat *cots ,  PnlVect* s_t);
+
+    // calculer les deltas
+    double MonteCarlo::get_delta();
 };
 
 #endif
