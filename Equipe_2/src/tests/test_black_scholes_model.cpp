@@ -13,7 +13,7 @@ TEST(BlackScholesModel, TestAssetCall)
 
     PnlMat *mat_asset = pnl_mat_create(monte_carlo->option->option_size, monte_carlo->fixing_dates_number + 1);
 
-    model->asset(model->spots, list_ti, mat_asset);
+    model->asset(0, list_ti, mat_asset);
 
     pnl_vect_free(&list_ti);
     pnl_mat_free(&mat_asset);

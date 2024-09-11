@@ -18,10 +18,10 @@ public:
     // PricingResults res_price ;
     // HedgingResults  res_hedge ; 
 
-    void get_all_dates(PnlVect *vect , double t , int i ) const;
+    void get_all_dates(PnlVect *vect, double t, int i) const;
 
 public:
-    MonteCarlo(Option *option, BlackScholesModel *model, int N, int M , PnlMat* data );
+    MonteCarlo(Option *option, BlackScholesModel *model, int N, int M, PnlMat *data, double h);
     ~MonteCarlo();
     // calculer le price
     double price(double t);
