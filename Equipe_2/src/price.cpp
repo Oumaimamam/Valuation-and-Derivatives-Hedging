@@ -18,9 +18,11 @@ int main(int argc, char *argv[])
     // PnlVect *delta;
     // PnlVect *delta_std_dev;
 
-    monte_carlo->price(0, prix, prix_std_dev);
+    monte_carlo->price(0.105233, prix, prix_std_dev);
 
     std::cout << "price =" << prix << std::endl;
+    std::cout << "expected_t =" << 9.1280832137086 << std::endl;
+
 
     // PricingResults res(prix, prix_std_dev, delta, delta_std_dev);
     // std::cout << res << std::endl;

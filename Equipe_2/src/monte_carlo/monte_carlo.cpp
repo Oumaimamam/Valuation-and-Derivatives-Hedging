@@ -135,8 +135,7 @@ void MonteCarlo::get_cotations(double t, PnlMat *cots, PnlVect *s_t)
 
 PnlVect* MonteCarlo::delta(PnlVect* delta_vect, double t, PnlMat *cots, PnlVect *s_t)
 {
-    int D = this->option->option_size; 
-    int N = this->fixing_dates_number; 
+
     double T = this->option->maturity;
     int M = this->sample_number; 
     double h = this->fd_step;
@@ -160,7 +159,10 @@ PnlVect* MonteCarlo::delta(PnlVect* delta_vect, double t, PnlMat *cots, PnlVect 
     // PnlMat *matrix_sim = pnl_mat_create(D, this->fixing_dates_number - index);
     //get_cotations(t, cots, s_t);
 
-    for (int d = 0; d < D; d++)
+    PnlMat *matrix_sim = pnl_mat_create(D, N - index);
+
+
+    if (t == 0.0)
     {
         double delta_sum = 0.0;
 
@@ -199,8 +201,57 @@ PnlVect* MonteCarlo::delta(PnlVect* delta_vect, double t, PnlMat *cots, PnlVect 
         double delta_d = delta_sum * exp(- r * (T-t))/ (M*s_t[d]);
         pnl_vect_set(deltas, d, delta_d);
     }
-    pnl_mat_free(&cots);
-    pnl_vect_free(&s_t);
-    pnl_mat_free(&mat_plus_h);
-    pnl_mat_free(&mat_minus_h);
+
+    pnl_mat_free(&matrix_sim);
+    pnl_vect_free(&dates);
+
 }
+
+
+
+
+// PnlVect* MonteCarlo::delta(PnlVect* delta_vect)
+// {
+//     int D = this->option->option_size; 
+//     int N = this->fixing_dates_number; 
+//     double T = this->option->maturity;
+//     int M = this->sample_number; 
+//     double h = this->fd_step;
+//     int i = compute_last_index(t, T, N);
+//     pnl_vect_resize(deltas, D);
+
+//     PnlMat *cots = pnl_mat_new(); 
+//     PnlVect *s_t = pnl_vect_new(); 
+//     PnlMat *mat_plus_h = pnl_mat_new(); 
+//     PnlMat *mat_minus_h = pnl_mat_new(); 
+//     PnlMat *matrix_sim = pnl_mat_create(D, this->fixing_dates_number - index);
+//     get_cotations(t, cots, s_t);
+
+//     for (int d = 0; d < D; d++)
+//     {
+//         double delta_sum = 0.0;
+//         for (int j = 0; j < M; j++)
+//         {
+//             pnl_vect_clone(s_t, this->model->spots);
+//             pnl_vect_set(s_t, d, pnl_vect_get(s_t, d) * (1 + h));
+//             this->model->asset(s_t, cots, mat_plus_h);
+
+//             pnl_vect_set(s_t, d, pnl_vect_get(s_t, d) * (1 - 2 * h));
+//             this->model->asset(s_t, cots, mat_minus_h);
+
+//             double payoff_plus = this->option->payOff(mat_plus_h);
+//             double payoff_minus = this->option->payOff(mat_minus_h);
+
+            
+//             delta_sum += (payoff_plus - payoff_minus) / (2 * h);
+//         }
+
+        
+//         double delta_d = delta_sum / M;
+//         pnl_vect_set(deltas, d, delta_d);
+//     }
+//     pnl_mat_free(&cots);
+//     pnl_vect_free(&s_t);
+//     pnl_mat_free(&mat_plus_h);
+//     pnl_mat_free(&mat_minus_h);
+// }

@@ -24,11 +24,12 @@ public:
     MonteCarlo(Option *option, BlackScholesModel *model, int N, int M, PnlMat *data, double h);
     ~MonteCarlo();
     // calculer le price
-    double price(double t);
+    void price(double t , double &price, double &price_std);
     void get_cotations(double t, PnlMat *cots ,  PnlVect* s_t);
+    void get_matrix_of_sim(double t , PnlMat *matrix);
 
     // calculer les deltas
-    double MonteCarlo::get_delta();
+    // double MonteCarlo::get_delta();
 };
 
 #endif
