@@ -24,6 +24,7 @@ public:
     // calculer le price
     void price(double t, double &price, double &price_std);
     void get_cotations(double t, PnlMat *cots, PnlVect *s_t);
+    void get_matrix_of_sim(double t , PnlMat* matrix);
 };
 
 #endif

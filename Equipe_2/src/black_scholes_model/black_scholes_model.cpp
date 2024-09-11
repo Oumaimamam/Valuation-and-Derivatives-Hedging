@@ -50,7 +50,7 @@ void BlackScholesModel::asset(double t, PnlVect *dates, PnlMat *mat_asset)
     PnlVect *G = pnl_vect_create(D);
 
     // remplir la matrice mat_asset
-    for (int j = t == 0.0 ? 1 : 0; j < n; j++)
+    for (int j = 0; j < n; j++)
     {
         for (int d = 0; d < D; d++)
         {
