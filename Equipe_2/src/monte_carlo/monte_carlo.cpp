@@ -58,6 +58,7 @@ MonteCarlo::~MonteCarlo()
 
 }
 
+
 void MonteCarlo::price(double &price, double &price_std)
 {
 
@@ -94,7 +95,8 @@ void MonteCarlo::price(double &price, double &price_std)
     pnl_mat_free(&matrix);
 }
 
-void MonteCarlo::price(double t , double &price, double &price_std , PnlMat* Past)
+
+void MonteCarlo::price(double t, double &price, double &price_std, const PnlMat *Past)
 {
 
     int D = this->option->option_size;
@@ -114,7 +116,7 @@ void MonteCarlo::price(double t , double &price, double &price_std , PnlMat* Pas
     {
         // get_matrix_of_sim(t , matrix);
         this->model->asset(Past,t,matrix,this->rng);
-        double phi_j = this->option->payOff(matrix);
+     double phi_j = this->option->payOff(matrix);
         v_t += phi_j;
         price_std_dev += pow(phi_j, 2);
     }

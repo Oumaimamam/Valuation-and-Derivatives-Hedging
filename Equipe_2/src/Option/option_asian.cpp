@@ -20,7 +20,7 @@ double OptionAsian::payOff(PnlMat *matrix)
         sum_d +=  pnl_vect_scalar_prod(this->payoff_coeffcients,S_ti);
     }
 
-    sum_d = sum_d / (cols) - this->strike;
+    sum_d = sum_d /(double)rows - this->strike;
     double zero = 0.0;
     // free
     pnl_vect_free(&S_ti);
