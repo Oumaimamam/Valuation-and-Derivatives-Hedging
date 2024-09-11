@@ -9,24 +9,42 @@ OptionAsian::OptionAsian(double T, double K, OptionType type, double D, PnlVect 
 
 double OptionAsian::payOff(PnlMat *matrix)
 {
-    double res = 0;
-    int rows = matrix->m; // D
-    int cols = matrix->n; // N+1
+    int rows = matrix->m; // N+1
+    int cols = matrix->n; // D
+    PnlVect *S_ti = pnl_vect_create(cols);
+    double sum_d = 0.0;
 
-    for (int d = 0; d < rows; d++)
-    {
-        double lamda_d = GET(payoff_coeffcients, d);
-        double res2 = 0;
-        for (int j = 0; j < cols; j++)
-        {
-            res2 += pnl_mat_get(matrix, d, j);
-        }
-
-        res += lamda_d * res2;
+    for(int i=0; i<rows-1; i++)
+    {   
+        pnl_mat_get_row(S_ti,matrix,i);
+        sum_d +=  pnl_vect_scalar_prod(this->payoff_coeffcients,S_ti);
     }
 
-    res = res / (cols) - this->strike;
+    sum_d = sum_d / (cols) - this->strike;
     double zero = 0.0;
-    return std::max(zero, res);
+    // free
+    pnl_vect_free(&S_ti);
+    return std::max(zero, sum_d);
 }
 OptionAsian::~OptionAsian() {}
+
+
+
+    // for (int i = 0; d < cols; d++)
+    // {
+    //     double lamda_d = GET(payoff_coeffcients, d);
+
+        
+        
+    //     res += lamda_d * pnl_vect_sum();
+        
+        
+        
+    //     double res2 = 0;
+    //     for (int j = 0; j < cols; j++)
+    //     {
+    //         res2 += pnl_mat_get(matrix, d, j);
+    //     }
+
+    // }
+    // res = pnl_mat_sum(matrix); 
