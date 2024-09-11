@@ -12,6 +12,6 @@ Option *convert_json_to_option(nlohmann::json json);
 
 BlackScholesModel *convert_json_to_model(nlohmann::json json);
 
-MonteCarlo *convert_json_to_monte_carlo(std::string file_path , std::string data_file_name = "");
+MonteCarlo *convert_json_to_monte_carlo(std::string file_path, std::string data_file_name = "");
 
 #endif

@@ -16,7 +16,16 @@ Option *convert_json_to_option(nlohmann::json json)
     std::string type_str;
 
     json.at("maturity").get_to(T);
-    json.at("strike").get_to(K);
+
+    if (json.contains("strike"))
+    {
+
+        json.at("strike").get_to(K);
+    }
+    else
+    {
+        K = 0.0;
+    }
     json.at("option size").get_to(D);
     json.at("payoff coefficients").get_to(coeff);
     if (coeff->size == 1 && D > 1)
@@ -40,7 +49,7 @@ BlackScholesModel *convert_json_to_model(nlohmann::json json)
     PnlVect *vols;
     PnlVect *spots;
     double corr;
-    double H ; 
+    double H;
 
     json.at("interest rate").get_to(r);
     json.at("option size").get_to(size);
@@ -57,15 +66,16 @@ BlackScholesModel *convert_json_to_model(nlohmann::json json)
     json.at("correlation").get_to(corr);
     json.at("hedging dates number").get_to(H);
 
-    BlackScholesModel *model = new BlackScholesModel(r, vols, spots, corr , H);
+    BlackScholesModel *model = new BlackScholesModel(r, vols, spots, corr, H);
 
     return model;
 }
 
-MonteCarlo *convert_json_to_monte_carlo(std::string file_path  , std::string data_file_name )
+MonteCarlo *convert_json_to_monte_carlo(std::string file_path, std::string data_file_name)
 {
     int N;
     int M;
+    double h;
 
     std::ifstream file(file_path);
     if (!file.is_open())
@@ -77,24 +87,23 @@ MonteCarlo *convert_json_to_monte_carlo(std::string file_path  , std::string dat
 
     json.at("fixing dates number").get_to(N);
     json.at("sample number").get_to(M);
+    json.at("fd step").get_to(h);
 
     BlackScholesModel *model = convert_json_to_model(json);
     Option *option = convert_json_to_option(json);
 
     file.close();
 
-    if(data_file_name != "") {
-        PnlMat* data = pnl_mat_create_from_file(data_file_name.c_str());
-        MonteCarlo *monte_carlo = new MonteCarlo(option, model, N, M , data);
-        
-        return monte_carlo;
+    if (data_file_name != "")
+    {
+        PnlMat *data = pnl_mat_create_from_file(data_file_name.c_str());
+        MonteCarlo *monte_carlo = new MonteCarlo(option, model, N, M, data, h);
 
-    } else {
-        MonteCarlo *monte_carlo = new MonteCarlo(option, model, N, M , NULL);
         return monte_carlo;
-
     }
-        
-
-
+    else
+    {
+        MonteCarlo *monte_carlo = new MonteCarlo(option, model, N, M, NULL, h);
+        return monte_carlo;
+    }
 }

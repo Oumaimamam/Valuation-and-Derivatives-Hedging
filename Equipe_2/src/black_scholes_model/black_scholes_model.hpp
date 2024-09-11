@@ -12,15 +12,14 @@ public:
     PnlVect *spots;      // pnl_vect_free
     double correlation;
     int model_size;
-    int hedging_dates_number ; 
+    int hedging_dates_number;
     PnlRng *rng; // pnl_rng_free(&rng)
 
 public:
     BlackScholesModel();
-    BlackScholesModel(double rate, PnlVect *vol, PnlVect *spots, double corr , double H);
+    BlackScholesModel(double rate, PnlVect *vol, PnlVect *spots, double corr, double H);
     ~BlackScholesModel();
-    void asset(PnlVect* spots ,PnlVect *Dates, PnlMat *mat_asset);
+    void asset(double t, PnlVect *Dates, PnlMat *mat_asset);
     void get_matrix_Cholesky_corr(PnlMat *matrix);
-    
 };
 #endif
