@@ -5,7 +5,7 @@
 
 TEST(MonteCarloTest, TestingPriceCall)
 {
-    MonteCarlo *monte_carlo = convert_json_to_monte_carlo("../../data/call/call.json", "../../data/call/call_market.txt");
+    MonteCarlo *monte_carlo = convert_json_to_monte_carlo("../../data/call/call.json");
     double price = 0.0;
     double price_std_dev = 0.0;
     monte_carlo->price(0, price, price_std_dev);
@@ -20,7 +20,7 @@ TEST(MonteCarloTest, TestingPriceCall)
 
 TEST(MonteCarloTest, TestingPriceAsian)
 {
-    MonteCarlo *monte_carlo = convert_json_to_monte_carlo("../../data/asian/asian.json", "../../data/asian/asian_market.txt");
+    MonteCarlo *monte_carlo = convert_json_to_monte_carlo("../../data/asian/asian.json");
     double price = 0.0;
     double price_std_dev = 0.0;
     monte_carlo->price(0, price, price_std_dev);
@@ -32,7 +32,7 @@ TEST(MonteCarloTest, TestingPriceAsian)
 
 TEST(MonteCarloTest, TestingPriceBasket2D)
 {
-    MonteCarlo *monte_carlo = convert_json_to_monte_carlo("../../data/basket/basket_2d/basket_2d.json", "../../data/basket/basket_2d/basket_2d_market.txt");
+    MonteCarlo *monte_carlo = convert_json_to_monte_carlo("../../data/basket/basket_2d/basket_2d.json");
 
     double price = 0.0;
     double price_std_dev = 0.0;
@@ -46,7 +46,7 @@ TEST(MonteCarloTest, TestingPriceBasket2D)
 
 TEST(MonteCarloTest, TestingPriceBasket5D)
 {
-    MonteCarlo *monte_carlo = convert_json_to_monte_carlo("../../data/basket/basket_5d/basket_5d.json", "../../data/basket/basket_5d/basket_5d_market.txt");
+    MonteCarlo *monte_carlo = convert_json_to_monte_carlo("../../data/basket/basket_5d/basket_5d.json");
     double price = 0.0;
     double price_std_dev = 0.0;
     monte_carlo->price(0, price, price_std_dev);
@@ -57,7 +57,7 @@ TEST(MonteCarloTest, TestingPriceBasket5D)
 
 TEST(MonteCarloTest, TestingPriceBasket5D1)
 {
-    MonteCarlo *monte_carlo = convert_json_to_monte_carlo("../../data/basket/basket_5d_1/basket_5d_1.json", "../../data/basket/basket_5d_1/basket_5d_1_market.txt");
+    MonteCarlo *monte_carlo = convert_json_to_monte_carlo("../../data/basket/basket_5d_1/basket_5d_1.json");
     double price = 0.0;
     double price_std_dev = 0.0;
     monte_carlo->price(0, price, price_std_dev);
@@ -68,7 +68,7 @@ TEST(MonteCarloTest, TestingPriceBasket5D1)
 
 TEST(MonteCarloTest, TestingPriceBasket40D)
 {
-    MonteCarlo *monte_carlo = convert_json_to_monte_carlo("../../data/basket/basket_40d/basket_40d.json", "../../data/basket/basket_40d/basket_40d_market.txt");
+    MonteCarlo *monte_carlo = convert_json_to_monte_carlo("../../data/basket/basket_40d/basket_40d.json");
     double price = 0.0;
     double price_std_dev = 0.0;
 
@@ -80,7 +80,7 @@ TEST(MonteCarloTest, TestingPriceBasket40D)
 
 TEST(MonteCarloTest, TestingPricePerf)
 {
-    MonteCarlo *monte_carlo = convert_json_to_monte_carlo("../../data/perf/perf.json", "../../data/perf/perf_market.txt");
+    MonteCarlo *monte_carlo = convert_json_to_monte_carlo("../../data/perf/perf.json");
     double price = 0.0;
     double price_std_dev = 0.0;
 

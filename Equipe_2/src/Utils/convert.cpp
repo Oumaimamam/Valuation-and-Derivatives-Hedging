@@ -71,7 +71,7 @@ BlackScholesModel *convert_json_to_model(nlohmann::json json)
     return model;
 }
 
-MonteCarlo *convert_json_to_monte_carlo(std::string file_path, std::string data_file_name)
+MonteCarlo *convert_json_to_monte_carlo(std::string file_path)
 {
     int N;
     int M;
@@ -92,18 +92,11 @@ MonteCarlo *convert_json_to_monte_carlo(std::string file_path, std::string data_
     BlackScholesModel *model = convert_json_to_model(json);
     Option *option = convert_json_to_option(json);
 
+
+    MonteCarlo *monte_carlo = new MonteCarlo(option, model, N, M, h);
+    
+
     file.close();
+    return monte_carlo;
 
-    if (data_file_name != "")
-    {
-        PnlMat *data = pnl_mat_create_from_file(data_file_name.c_str());
-        MonteCarlo *monte_carlo = new MonteCarlo(option, model, N, M, data, h);
-
-        return monte_carlo;
-    }
-    else
-    {
-        MonteCarlo *monte_carlo = new MonteCarlo(option, model, N, M, NULL, h);
-        return monte_carlo;
-    }
 }
