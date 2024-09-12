@@ -14,7 +14,8 @@ public:
     int fixing_dates_number;
     int sample_number;
     double fd_step;
-    PnlRng *rng; // pnl_rng_free(&rng)
+    PnlRng *rng; 
+    int hedging_date_number;
     // PricingResults res_price ;
     // HedgingResults  res_hedge ; 
 
@@ -25,15 +26,17 @@ public:
     ~MonteCarlo();
     // calculer le price
     void price(double &price, double &price_std);
-    void price(double t , double &price, double &price_std , const PnlMat* Past);
+    void price(double t , double &price, double &price_std , const PnlMat* Past, PnlMat *matrix);
     void calculPAndL(const PnlMat *past);
 
-    // void get_cotations(double t, PnlMat *cots ,  PnlVect* s_t);
+    void get_cotations(double t, PnlMat *cots, PnlMat *market_data);
     // void get_matrix_of_sim(double t , PnlMat *matrix);
     // void couverture
 
     // calculer les deltas
-    // double MonteCarlo::get_delta();
+    void MonteCarlo::get_delta(PnlVect* Vect);
+
+    void getCouvPrtf(PnlMat* Past, PnlMat* market_data, double &p_and_l, double t);
 };
 
 #endif
