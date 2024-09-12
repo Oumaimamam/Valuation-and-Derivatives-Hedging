@@ -22,8 +22,8 @@ BlackScholesModel::BlackScholesModel(double rate, PnlVect *vol, PnlVect *spots, 
 
 BlackScholesModel::~BlackScholesModel()
 {
-    pnl_vect_free(&this->volatility);
-    pnl_vect_free(&this->spots);
+    pnl_vect_free(&volatility);
+    pnl_vect_free(&spots);
 }
 
 
@@ -47,19 +47,19 @@ void BlackScholesModel::asset(const PnlMat *past, double t, PnlMat *path, PnlRng
     pnl_mat_extract_subblock(path, past,0, last_index_t +1, 0,D);
 
     // calcul de St_i+1
+    double r = this->interest_rate;
 
     PnlVect *calcul = pnl_vect_create(D);
 
     for(int ligne =  last_index_t; ligne<n; ligne++)
     {
 
+        pnl_vect_rng_normal(G, D, rng);
         for (int d = 0; d < D; d++)
         {
             double s_t_i = pnl_vect_get(col, d);
-            double r = this->interest_rate;
             double sigma_d = pnl_vect_get(this->volatility, d);
             pnl_mat_get_row(L_d, L, d);
-            pnl_vect_rng_normal(G, D, rng);
 
             double x = s_t_i * exp((r - pow(sigma_d, 2)/2.0) * (time_step) + sigma_d * sqrt(time_step) * pnl_vect_scalar_prod(L_d, G));//t{i+1} - t{i} = T/N
             pnl_vect_set(calcul, d, x);
@@ -102,17 +102,18 @@ void BlackScholesModel::asset(PnlMat *path, PnlRng *rng)
 
     // calcul de St_i+1
 
+    double r = this->interest_rate;
 
     for(int ligne =  1; ligne < n; ligne++)
     {
 
+        pnl_vect_rng_normal(G, D, rng);
+
         for (int d = 0; d < D; d++)
         {
             double s_t_i = pnl_vect_get(col, d);
-            double r = this->interest_rate;
             double sigma_d = pnl_vect_get(this->volatility, d);
             pnl_mat_get_row(L_d, L, d);
-            pnl_vect_rng_normal(G, D, rng);
 
             double x = s_t_i * exp((r - pow(sigma_d, 2)/2.0) * (time_step) + sigma_d * sqrt(time_step) * pnl_vect_scalar_prod(L_d, G));//t{i+1} - t{i} = T/N
             pnl_vect_set(col, d, x);
@@ -120,6 +121,12 @@ void BlackScholesModel::asset(PnlMat *path, PnlRng *rng)
 
         pnl_mat_set_row(path ,col,ligne);
     }
+
+        //free
+    pnl_vect_free(&col);
+    pnl_mat_free(&L);
+    pnl_vect_free(&L_d);
+    pnl_vect_free(&G);
 
 }
 

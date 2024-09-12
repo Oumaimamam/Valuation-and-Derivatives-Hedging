@@ -39,23 +39,9 @@ MonteCarlo::MonteCarlo(Option *option, BlackScholesModel *model, int N, int M, d
 
 MonteCarlo::~MonteCarlo()
 {
-    // Libérer la mémoire si nécessaire
-    if (option != nullptr)
-    {
-        delete option;
-    }
-    if (model != nullptr)
-    {
-        delete model;
-    }
-
-
-    if (rng != nullptr)
-    {
-        pnl_rng_free(&rng);
-    }
-    
-
+    delete option;
+    delete model;
+    pnl_rng_free(&rng);
 }
 
 
@@ -86,7 +72,7 @@ void MonteCarlo::price(double &price, double &price_std)
     }
 
 
-    double inv_M = 1.0 / (double)M;
+    double inv_M = 1.0/(double)M;
 
     price = std::exp(-r * (T )) * inv_M * v_t;
 
@@ -116,7 +102,7 @@ void MonteCarlo::price(double t, double &price, double &price_std, const PnlMat 
     {
         // get_matrix_of_sim(t , matrix);
         this->model->asset(Past,t,matrix,this->rng);
-     double phi_j = this->option->payOff(matrix);
+        double phi_j = this->option->payOff(matrix);
         v_t += phi_j;
         price_std_dev += pow(phi_j, 2);
     }

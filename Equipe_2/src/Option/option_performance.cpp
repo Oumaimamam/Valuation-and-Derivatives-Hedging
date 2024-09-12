@@ -28,6 +28,10 @@ double OptionPerformance::payOff(PnlMat *matrix)
 
         res += std::max(sum_d_2/sum_d_1 - 1.0, 0.0);
     }
+    
+    //free
+    pnl_vect_free(&S1_ti);
+    pnl_vect_free(&S2_ti);
 
     return 1 + res;
 }

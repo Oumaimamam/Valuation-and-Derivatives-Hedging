@@ -15,6 +15,8 @@ TEST(MonteCarloTest, TestingPriceCall)
 
     std::cout << "price_std_dev = " << price_std_dev << std::endl;
     std::cout << "expected_price_std_dev = " << 0.06638859132968258 << std::endl;
+
+
     delete monte_carlo;
 }
 
@@ -25,8 +27,17 @@ TEST(MonteCarloTest, TestingPriceAsian)
     double price_std_dev = 0.0;
     monte_carlo->price(0, price, price_std_dev);
 
+    double price_expe = 4.6230359733474184;
+    double price_std_exp = 0.029779756412935725 ;
+
+
     std::cout << "price_t = " << price << std::endl;
-    std::cout << "expected_t = " << 4.6230359733474184 << std::endl;
+    std::cout << "price_expected_t = " << price_expe << std::endl;
+
+    std::cout << "price_std_t = " << price_std_dev << std::endl;
+    std::cout << "price_std_dev_expected = " <<price_std_exp << std::endl;
+        
+    std::cout << "IC_95 = [" << price_expe - price_std_exp*1.96 << ","  << price_expe +  price_std_exp*1.96 << "]" << std::endl;
     delete monte_carlo;
 }
 
