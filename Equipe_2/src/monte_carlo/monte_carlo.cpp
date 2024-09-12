@@ -150,50 +150,56 @@ void MonteCarlo::get_cotations(double t, PnlMat *cots, PnlVect *s_t)
     pnl_vect_free(&col);
 }
 
-PnlVect* MonteCarlo::delta(PnlVect* delta_vect, double t, PnlMat *cots, PnlVect *s_t)
+PnlVect* MonteCarlo::delta(PnlVect* deltas_vect, double t, const PnlMat *cots, PnlVect *s_t)
 {
+    // Usage of the function
+    // BEFORE CALLING THE FUNCTION
+    //PnlVect* deltas_vect = pnl_vect_new();
+    //PnlVect* s_t = pnl_vect_new();
+    //PnlMat* cots = pnl_mat_new();
+
+    //get_cotations(t, cots, s_t);
+
+    // AFTER CALLING THE FUNCTION
+    //delta(deltas_vect, t, cots, s_t);
+    //pnl_vect_free(&deltas_vect);
+    //pnl_vect_free(&s_t);
+    //pnl_mat_free(&cots);
+
 
     double T = this->option->maturity;
     int M = this->sample_number; 
     double h = this->fd_step;
     int i = compute_last_index(t, T, N);
-    PnlMat *mat_asset = pnl_mat_create(N - i, D); 
-    pnl_vect_resize(deltas, D);
-    //PnlMat *cots = pnl_mat_new(); 
-    //PnlVect *s_t = pnl_vect_new(); 
-    PnlMat *mat_plus_h = pnl_mat_new(); 
-    PnlMat *mat_minus_h = pnl_mat_new(); 
+
+    PnlMat *mat_asset = pnl_mat_create(N - i, D);
+    PnlMat *mat_asset_plus = pnl_mat_new(); 
+    PnlMat *mat_asset_minus = pnl_mat_new();
     PnlVect *gd_plus = pnl_vect_new();
     PnlVect *gd_minus = pnl_vect_new();
-    PnlVect *spots = pnl_vect_new();
-    PnlVect* dates = pnl_vect_new();
-    PnlMat *mat_asset_plus = pnl_mat_new(); 
-    PnlMat *mat_asset_minus = pnl_mat_new(); 
-    PnlMat *M_left = pnl_mat_create(N + 1, D);
-    PnlMat *M_left = pnl_mat_create(N + 1, D);
+    PnlMat *M_plus = pnl_mat_create(N + 1, D);
+    PnlMat *M_minus = pnl_mat_create(N + 1, D);
 
 
-    // PnlMat *matrix_sim = pnl_mat_create(D, this->fixing_dates_number - index);
-    //get_cotations(t, cots, s_t);
-
-    PnlMat *matrix_sim = pnl_mat_create(D, N - index);
-
-
-    if (t == 0.0)
+    for (int d = 0; d < D; d++)
     {
         double delta_sum = 0.0;
 
         for (int j = 0; j < M; j++)
         {
-            pnl_vect_clone(spots, this->model->spots);
 
+            // gd+ and gd-
             pnl_vect_clone(gd_plus, s_t);
             pnl_vect_set(gd_plus, d, pnl_vect_get(s_t, d) * (1 + h));
-
             pnl_vect_clone(gd_minus, s_t);
             pnl_vect_set(gd_minus, d, pnl_vect_get(s_t, d) * (1 - h));
-            get_all_dates(dates);
-            this->model->asset(t, dates, mat_asset);
+
+            //asset(cots, t, PnlMat *path, this->rng, this->option->maturity)
+            //get_all_dates(dates);
+            //this->model->asset(t, dates, mat_asset);
+
+            // matrix of sim
+            get_matrix_of_sim(t, mat_asset);
             pnl_mat_clone(mat_asset_plus, mat_asset);
             pnl_mat_clone(mat_asset_minus, mat_asset);
 
@@ -215,13 +221,19 @@ PnlVect* MonteCarlo::delta(PnlVect* delta_vect, double t, PnlMat *cots, PnlVect 
         }
 
         
-        double delta_d = delta_sum * exp(- r * (T-t))/ (M*s_t[d]);
-        pnl_vect_set(deltas, d, delta_d);
+        double delta_d = delta_sum * exp(- r * (T - t)) / (M * pnl_vect_get(s_t, d));
+        pnl_vect_set(deltas_vect, d, delta_d);
     }
 
-    pnl_mat_free(&matrix_sim);
-    pnl_vect_free(&dates);
+    pnl_vect_free(&gd_plus);
+    pnl_vect_free(&gd_minus);
+    pnl_mat_free(&mat_asset);
+    pnl_mat_free(&mat_asset_plus);
+    pnl_mat_free(&mat_asset_minus);
+    pnl_mat_free(&M_plus);
+    pnl_mat_free(&M_minus);
 
+    return deltas_vect;
 }
 
 
