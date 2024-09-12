@@ -145,6 +145,17 @@ target_link_libraries(test_pricer
     pthread
 )
 
+# Test Deltas : 
+add_executable(test_deltas src/tests/test_deltas.cpp)
+target_link_libraries(test_deltas
+    my_lib
+    ${PNL_LIBRARIES}
+    nlohmann_json::nlohmann_json
+    ${GTEST_LIBRARIES}
+    gtest_main
+    pthread
+)
+
 # Test hedge : 
 add_executable(test_hedge src/tests/test_hedge.cpp)
 target_link_libraries(test_hedge
