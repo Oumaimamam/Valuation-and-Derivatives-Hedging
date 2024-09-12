@@ -11,19 +11,19 @@ double OptionAsian::payOff(PnlMat *matrix)
 {
     int rows = matrix->m; // N+1
     int cols = matrix->n; // D
-    PnlVect *S_ti = pnl_vect_create(cols);
+    PnlVect *ligne = pnl_vect_create(cols);
     double sum_d = 0.0;
 
-    for(int i=0; i<rows-1; i++)
+    for(int i=0; i<rows; i++)
     {   
-        pnl_mat_get_row(S_ti,matrix,i);
-        sum_d +=  pnl_vect_scalar_prod(this->payoff_coeffcients,S_ti);
+        pnl_mat_get_row(ligne,matrix,i);
+        sum_d +=  pnl_vect_scalar_prod(this->payoff_coeffcients,ligne);
     }
 
-    sum_d = sum_d /(double)rows - this->strike;
+    sum_d = sum_d/(double)rows - this->strike;
     double zero = 0.0;
     // free
-    pnl_vect_free(&S_ti);
+    pnl_vect_free(&ligne);
     return std::max(zero, sum_d);
 }
 OptionAsian::~OptionAsian() {}

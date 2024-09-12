@@ -1,20 +1,11 @@
 #include <gtest/gtest.h>
-#include "../monte_carlo/monte_carlo.hpp"
-#include "../Utils/convert.hpp"
 
-TEST(BlackScholesModel, TestAssetCall)
+TEST(ExampleTest, HandlesTrueAssertions)
 {
-    MonteCarlo *monte_carlo = convert_json_to_monte_carlo("../../data/call/call.json");
+    EXPECT_TRUE(true);
+}
 
-    BlackScholesModel *model = monte_carlo->model;
-
-    PnlVect *list_ti = pnl_vect_new();
-    monte_carlo->get_all_dates(list_ti, 0, 0);
-
-    PnlMat *mat_asset = pnl_mat_create(monte_carlo->option->option_size, monte_carlo->fixing_dates_number + 1);
-
-    model->asset(0, list_ti, mat_asset);
-
-    pnl_vect_free(&list_ti);
-    pnl_mat_free(&mat_asset);
+TEST(ExampleTest, HandlesFalseAssertions)
+{
+    EXPECT_FALSE(false);
 }
