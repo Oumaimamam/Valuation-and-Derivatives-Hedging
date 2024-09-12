@@ -51,6 +51,9 @@ BlackScholesModel *convert_json_to_model(nlohmann::json json)
     double corr;
     double H;
 
+    double T ;
+    double N ; 
+
     json.at("interest rate").get_to(r);
     json.at("option size").get_to(size);
     json.at("volatility").get_to(vols);
@@ -66,7 +69,12 @@ BlackScholesModel *convert_json_to_model(nlohmann::json json)
     json.at("correlation").get_to(corr);
     json.at("hedging dates number").get_to(H);
 
-    BlackScholesModel *model = new BlackScholesModel(r, vols, spots, corr, H);
+    json.at("maturity").get_to(T);
+    json.at("fixing dates number").get_to(N);
+
+    double timeStep = T/(double)N ; 
+
+    BlackScholesModel *model = new BlackScholesModel(r, vols, spots, corr, H , timeStep);
 
     return model;
 }

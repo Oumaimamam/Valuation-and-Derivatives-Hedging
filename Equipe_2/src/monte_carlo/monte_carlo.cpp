@@ -72,7 +72,7 @@ void MonteCarlo::price(double &price, double &price_std)
     double price_std_dev = 0.0;
 
 
-    PnlMat *matrix = pnl_mat_create(D, N + 1);
+    PnlMat *matrix = pnl_mat_create(N + 1 , D);
 
 
 
@@ -110,7 +110,7 @@ void MonteCarlo::price(double t, double &price, double &price_std, const PnlMat 
     double price_std_dev = 0.0;
 
 
-    PnlMat *matrix = pnl_mat_create(D, N + 1);
+    PnlMat *matrix = pnl_mat_create(N + 1, D);
 
     for (int i = 0; i < M; i++)
     {
