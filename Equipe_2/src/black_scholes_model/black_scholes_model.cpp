@@ -26,12 +26,11 @@ BlackScholesModel::~BlackScholesModel()
     pnl_vect_free(&spots);
 }
 
-
 void BlackScholesModel::asset(const PnlMat *past, double t, PnlMat *path, PnlRng *rng)
 {
     int n = path->m; // n = N+1
     int D = this->model_size;
-        // matrice L :
+    // matrice L :
     PnlMat *L = pnl_mat_new();
     get_matrix_Cholesky_corr(L);
 
@@ -40,18 +39,20 @@ void BlackScholesModel::asset(const PnlMat *past, double t, PnlMat *path, PnlRng
     // t>0
     // col contient le vecteur s_t
     PnlVect *col = pnl_vect_create(D);
-    pnl_mat_get_row(col, past,past->m-1);
+    pnl_mat_get_row(col, past, past->m - 1);
 
     int last_index_t = past->m - 2;
 
-    pnl_mat_extract_subblock(path, past,0, last_index_t +1, 0,D);
+    PnlMat *sub_block = pnl_mat_new();
 
+    pnl_mat_extract_subblock(sub_block, past, 0, last_index_t + 1, 0, D);
+    pnl_mat_set_subblock(path, sub_block, 0, 0);
     // calcul de St_i+1
     double r = this->interest_rate;
 
     PnlVect *calcul = pnl_vect_create(D);
 
-    for(int ligne =  last_index_t; ligne<n; ligne++)
+    for (int ligne = last_index_t; ligne < n; ligne++)
     {
 
         pnl_vect_rng_normal(G, D, rng);
@@ -61,32 +62,28 @@ void BlackScholesModel::asset(const PnlMat *past, double t, PnlMat *path, PnlRng
             double sigma_d = pnl_vect_get(this->volatility, d);
             pnl_mat_get_row(L_d, L, d);
 
-            double x = s_t_i * exp((r - pow(sigma_d, 2)/2.0) * (time_step) + sigma_d * sqrt(time_step) * pnl_vect_scalar_prod(L_d, G));//t{i+1} - t{i} = T/N
+            double x = s_t_i * exp((r - pow(sigma_d, 2) / 2.0) * (time_step) + sigma_d * sqrt(time_step) * pnl_vect_scalar_prod(L_d, G)); // t{i+1} - t{i} = T/N
             pnl_vect_set(calcul, d, x);
         }
 
-        pnl_mat_set_row(path ,calcul,ligne);
+        pnl_mat_set_row(path, calcul, ligne);
     }
 
-    pnl_vect_free(&calcul); 
-    
+    pnl_vect_free(&calcul);
 
-    //free
+    // free
     pnl_vect_free(&col);
     pnl_mat_free(&L);
     pnl_vect_free(&L_d);
     pnl_vect_free(&G);
-
 }
-
-
 
 // pour le cas t = 0
 void BlackScholesModel::asset(PnlMat *path, PnlRng *rng)
 {
     int n = path->m; // n = N+1
     int D = this->model_size;
-        // matrice L :
+    // matrice L :
     PnlMat *L = pnl_mat_new();
     get_matrix_Cholesky_corr(L);
 
@@ -95,16 +92,15 @@ void BlackScholesModel::asset(PnlMat *path, PnlRng *rng)
     // t>0
     // col contient le vecteur s_0
     PnlVect *col = pnl_vect_create(D);
-    pnl_vect_clone(col,spots);
+    pnl_vect_clone(col, spots);
 
-
-    pnl_mat_set_row(path,spots,0);
+    pnl_mat_set_row(path, spots, 0);
 
     // calcul de St_i+1
 
     double r = this->interest_rate;
 
-    for(int ligne =  1; ligne < n; ligne++)
+    for (int ligne = 1; ligne < n; ligne++)
     {
 
         pnl_vect_rng_normal(G, D, rng);
@@ -115,21 +111,19 @@ void BlackScholesModel::asset(PnlMat *path, PnlRng *rng)
             double sigma_d = pnl_vect_get(this->volatility, d);
             pnl_mat_get_row(L_d, L, d);
 
-            double x = s_t_i * exp((r - pow(sigma_d, 2)/2.0) * (time_step) + sigma_d * sqrt(time_step) * pnl_vect_scalar_prod(L_d, G));//t{i+1} - t{i} = T/N
+            double x = s_t_i * exp((r - pow(sigma_d, 2) / 2.0) * (time_step) + sigma_d * sqrt(time_step) * pnl_vect_scalar_prod(L_d, G)); // t{i+1} - t{i} = T/N
             pnl_vect_set(col, d, x);
         }
 
-        pnl_mat_set_row(path ,col,ligne);
+        pnl_mat_set_row(path, col, ligne);
     }
 
-        //free
+    // free
     pnl_vect_free(&col);
     pnl_mat_free(&L);
     pnl_vect_free(&L_d);
     pnl_vect_free(&G);
-
 }
-
 
 void BlackScholesModel::get_matrix_Cholesky_corr(PnlMat *matrix_chol)
 {
@@ -171,7 +165,7 @@ void BlackScholesModel::get_matrix_Cholesky_corr(PnlMat *matrix_chol)
 
 //     }
 //     pnl_vect_free(&st_0);
-    
+
 // }
 
 // void BlackScholesModel::shift_asset(PnlMat *shifted_paths, int d,double t, double h, const PnlMat *original_paths)
@@ -183,12 +177,10 @@ void BlackScholesModel::get_matrix_Cholesky_corr(PnlMat *matrix_chol)
 //     pnl_mat_free(&shifted_paths);
 //     */
 
-    
 //     int D = this->model_size;
 //     int N = original_paths->n;
 //     int T = this->time_step * N;
 //     int index = compute_last_index(t, T, N);
-    
 
 //     pnl_mat_clone(shifted_paths, original_paths);
 //     pnl_vect_set( pnl_get_row(original_paths, index), d, (1 + h ) * pnl_vect_get(pnl_get_row(shifted_paths, index), d));
@@ -201,4 +193,3 @@ void BlackScholesModel::get_matrix_Cholesky_corr(PnlMat *matrix_chol)
 //     }
 //     pnl_vect_free(&st_i);
 // }
-
