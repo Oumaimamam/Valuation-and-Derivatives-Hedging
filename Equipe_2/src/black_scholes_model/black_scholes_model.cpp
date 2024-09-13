@@ -143,53 +143,53 @@ void BlackScholesModel::get_matrix_Cholesky_corr(PnlMat *matrix_chol)
     pnl_mat_chol(matrix_chol);
 }
 
-// void BlackScholesModel::shift_asset(PnlMat *shifted_paths, double h, const PnlMat *original_paths)
-// {
-//     /*
-//     To use this function there are some steps to do :
-//     PnlMat* shifted_paths = pnl_mat_new();
-//     shift_asset(matrix);
-//     pnl_mat_free(&shifted_paths);
+void BlackScholesModel::shift_asset(PnlMat *shifted_paths, double h, const PnlMat *original_paths)
+{
+    /*
+    To use this function there are some steps to do :
+    PnlMat* shifted_paths = pnl_mat_new();
+    shift_asset(matrix);
+    pnl_mat_free(&shifted_paths);
 
-//     */
-//     int D = this->model_size;
-//     int N = original_paths->n;
+    */
+    int D = this->model_size;
+    int N = original_paths->n;
 
-//     pnl_mat_clone(shifted_paths, original_paths);
-//     pnl_vect_set( pnl_get_row(original_paths, 0), d, (1 + h ) * pnl_vect_get(pnl_get_row(shifted_paths, 0), d));
-//     PnlVect *st_0 =  pnl_get_row(original_paths, 0);
+    pnl_mat_clone(shifted_paths, original_paths);
+    pnl_vect_set( pnl_get_row(original_paths, 0), d, (1 + h ) * pnl_vect_get(pnl_get_row(shifted_paths, 0), d));
+    PnlVect *st_0 =  pnl_get_row(original_paths, 0);
 
-//     for(int i = 1 ; i < N; i++)
-//     {
-//         pnl_vect_mult_vect_term(pnl_get_row(shifted_paths, i),st_0);
+    for(int i = 1 ; i < N; i++)
+    {
+        pnl_vect_mult_vect_term(pnl_get_row(shifted_paths, i),st_0);
 
-//     }
-//     pnl_vect_free(&st_0);
+    }
+    pnl_vect_free(&st_0);
 
-// }
+}
 
-// void BlackScholesModel::shift_asset(PnlMat *shifted_paths, int d,double t, double h, const PnlMat *original_paths)
-// {
-//     /*
-//     To use this function there are some steps to do :
-//     PnlMat* shifted_paths = pnl_mat_new();
-//     shift_asset(matrix);
-//     pnl_mat_free(&shifted_paths);
-//     */
+void BlackScholesModel::shift_asset(PnlMat *shifted_paths, int d,double t, double h, const PnlMat *original_paths)
+{
+    /*
+    To use this function there are some steps to do :
+    PnlMat* shifted_paths = pnl_mat_new();
+    shift_asset(matrix);
+    pnl_mat_free(&shifted_paths);
+    */
 
-//     int D = this->model_size;
-//     int N = original_paths->n;
-//     int T = this->time_step * N;
-//     int index = compute_last_index(t, T, N);
+    int D = this->model_size;
+    int N = original_paths->n;
+    int T = this->time_step * N;
+    int index = compute_last_index(t, T, N);
 
-//     pnl_mat_clone(shifted_paths, original_paths);
-//     pnl_vect_set( pnl_get_row(original_paths, index), d, (1 + h ) * pnl_vect_get(pnl_get_row(shifted_paths, index), d));
-//     PnlVect *st_i =  pnl_get_row(original_paths, index);
+    pnl_mat_clone(shifted_paths, original_paths);
+    pnl_vect_set( pnl_get_row(original_paths, index), d, (1 + h ) * pnl_vect_get(pnl_get_row(shifted_paths, index), d));
+    PnlVect *st_i =  pnl_get_row(original_paths, index);
 
-//     for(int i = index + 1 ; i < N; i++)
-//     {
-//         pnl_vect_mult_vect_term(pnl_get_row(shifted_paths, i),st_i);
+    for(int i = index + 1 ; i < N; i++)
+    {
+        pnl_vect_mult_vect_term(pnl_get_row(shifted_paths, i),st_i);
 
-//     }
-//     pnl_vect_free(&st_i);
-// }
+    }
+    pnl_vect_free(&st_i);
+}
