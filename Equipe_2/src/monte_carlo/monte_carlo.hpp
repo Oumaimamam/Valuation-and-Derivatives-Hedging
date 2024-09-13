@@ -27,8 +27,6 @@ public:
     // calculer le price
     void price(double &price, double &price_std);
     void price(double t, double &price, double &price_std, const PnlMat *Past, PnlMat *matrix);
-    void calculPAndL(const PnlMat *past);
-
     void get_cotations(double t, PnlMat *cots, PnlMat *market_data);
     // void get_matrix_of_sim(double t , PnlMat *matrix);
     // void couverture
