@@ -22,5 +22,9 @@ public:
     void asset(const PnlMat *past, double t, PnlMat *path, PnlRng *rng);
     void asset(PnlMat *path, PnlRng *rng);
     void get_matrix_Cholesky_corr(PnlMat *matrix);
+    void shift_asset(PnlMat *shifted_paths, int d,double t, double h, const PnlMat *original_paths);
+    void shift_asset(PnlMat *shifted_paths, double h, const PnlMat *original_paths);
+
+
 };
 #endif

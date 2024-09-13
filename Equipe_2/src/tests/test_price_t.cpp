@@ -63,6 +63,7 @@ void get_cotations(double t, PnlMat *past, PnlMat *market_data, MonteCarlo *mont
     pnl_vect_free(&col);
 }
 
+
 int main()
 {
     MonteCarlo *monte_carlo = convert_json_to_monte_carlo("../../data/call/call.json");
@@ -109,3 +110,5 @@ int main()
 
     return 0;
 }
+
+

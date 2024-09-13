@@ -145,9 +145,20 @@ target_link_libraries(test_pricer
     pthread
 )
 
-# Test Pricer à t  
+# Test Pricer à t  D = 1
 add_executable(test_pricer_t src/tests/test_price_t.cpp)
 target_link_libraries(test_pricer_t
+    my_lib
+    ${PNL_LIBRARIES}
+    nlohmann_json::nlohmann_json
+    ${GTEST_LIBRARIES}
+    gtest_main
+    pthread
+)
+
+# Test Pricer à t  D
+add_executable(test_pricer_t_markov src/tests/test_price_t_markov.cpp)
+target_link_libraries(test_pricer_t_markov
     my_lib
     ${PNL_LIBRARIES}
     nlohmann_json::nlohmann_json
