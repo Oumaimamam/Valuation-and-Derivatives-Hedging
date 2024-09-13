@@ -1,23 +1,59 @@
 #include <gtest/gtest.h>
 #include "../Utils/convert.hpp"
 #include "../monte_carlo/monte_carlo.hpp"
+#include "../Utils/compute_last_index.hpp"
 #include <iostream>
 
 // test deltas option call t=0
+// void get_cotations(double t, PnlMat *past, PnlMat *market_data, MonteCarlo *monte_carlo)
+// {
+//     /*
+//     To use this function there are some steps to do :
 
-TEST(MonteCarloTest, TestingDeltasCall)
+//     Step 1 :
+//     PnlVect* s_t = pnl_vect_new();
+//     PnlMat* cots = pnl_mat_new();
+
+//     get_cotations(t , cots , s_t);
+
+//     pnl_vect_free(&s_t);
+//     pnl_mat_free(&cots);
+//   */
+
+//     int H = monte_carlo->model->hedging_dates_number;
+//     int N = monte_carlo->fixing_dates_number;
+//     double T = monte_carlo->option->maturity;
+//     int D = monte_carlo->option->option_size;
+
+//     int i = compute_last_index(t, T, N);
+
+//     pnl_mat_resize(past, i + 2, D);
+
+//     PnlVect *col = pnl_vect_create(D);
+
+//     for (int j = 0; j < i + 1; j++)
+//     {
+//         pnl_mat_get_row(col, market_data, j * H / N);
+//         pnl_mat_set_row(past, col, j);
+//     }
+
+//     // s_t
+//     pnl_mat_get_row(col, market_data, t * H / T);
+//     pnl_mat_set_row(past, col, i + 1);
+
+//     // free
+//     pnl_vect_free(&col);
+// }
+
+int main()
 {
-    MonteCarlo *monte_carlo = convert_json_to_monte_carlo("../../data/call/call.json", "../../data/call/call_market.txt");
+    MonteCarlo *monte_carlo = convert_json_to_monte_carlo("../../data/call/call.json");
 
     int option_size = monte_carlo->option->option_size;
-    PnlVect* deltas_vect = pnl_vect_create(option_size); // For storing deltas
-    PnlVect* stddev_deltas_vect = pnl_vect_create(option_size);  // For storing standard deviations of deltas
-    PnlVect* s_t = pnl_vect_new();  // Store the spot prices at t=0
-    PnlMat* cots = pnl_mat_new();   // Store the market data for asset prices at t=0
+    PnlVect* deltas_vect = pnl_vect_create(option_size);
+    PnlVect* stddev_deltas_vect = pnl_vect_create(option_size);
 
-    monte_carlo->get_cotations(0, cots, s_t);
-
-    monte_carlo->delta(cots, deltas_vect, stddev_deltas_vect, 0.0);
+    monte_carlo->delta(deltas_vect, stddev_deltas_vect);
 
     std::cout << "Deltas of the call option: ";
     for (int i = 0; i < deltas_vect->size; i++) {
@@ -37,18 +73,6 @@ TEST(MonteCarloTest, TestingDeltasCall)
     delete monte_carlo;
     pnl_vect_free(&deltas_vect);
     pnl_vect_free(&stddev_deltas_vect);
-    pnl_vect_free(&s_t);
-    pnl_mat_free(&cots);
+    return 1;
+
 }
-
-// #include <gtest/gtest.h>
-
-// TEST(ExampleTest, HandlesTrueAssertions)
-// {
-//     EXPECT_TRUE(true);
-// }
-
-// TEST(ExampleTest, HandlesFalseAssertions)
-// {
-//     EXPECT_FALSE(false);
-// }

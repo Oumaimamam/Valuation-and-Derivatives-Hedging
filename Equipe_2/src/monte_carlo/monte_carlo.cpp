@@ -22,6 +22,8 @@ MonteCarlo::~MonteCarlo()
     pnl_rng_free(&rng);
 }
 
+
+
 void MonteCarlo::price(double &price, double &price_std)
 {
 
@@ -82,7 +84,6 @@ void MonteCarlo::price(double t, double &price, double &price_std, const PnlMat 
 
     price_std = sqrt(exp(-2 * r * T) * (inv_M * price_std_dev - pow(inv_M * v_t, 2))) / sqrt(M);
 
-    // pnl_mat_free(&matrix);
 }
 
 void MonteCarlo::MonteCarlo::get_delta(PnlVect *Vect)
@@ -149,51 +150,54 @@ void MonteCarlo::delta(PnlVect* deltas_vect, PnlVect* stddev_deltas_vect)
     double r = this->model->interest_rate;
     double T = this->option->maturity;
 
-    PnlMat *original_assets = pnl_mat_create(N + 1, D);
-    this->model->asset(original_assets, this->rng);
-
     PnlMat *mat_asset_plus = pnl_mat_create(N + 1, D);
     PnlMat *mat_asset_minus = pnl_mat_create(N + 1, D);
 
     PnlVect *st_0 = pnl_vect_create(D);
-    pnl_mat_get_row(st_0, original_assets, 0); // Initial spot prices (S0)
-
+    
     // Temporary vectors to store delta values for each simulation
     PnlVect *deltas_sum = pnl_vect_create(D);
     PnlVect *deltas_square_sum = pnl_vect_create(D);
 
     // Loop over dimensions (assets)
-    for (int d = 0; d < D; d++) {
+    for (int d = 0; d < D; d++)
+    {
         double delta_sum = 0.0;
         double delta_square_sum = 0.0;
-
         // Monte Carlo simulations
-        for (int j = 0; j < M; j++) {
-            this->model->shift_asset(mat_asset_plus, d, h, original_assets);
-            this->model->shift_asset(mat_asset_minus, d, -h, original_assets);
+        for (int j = 0; j < M; j++)
+        {
+            this->model->asset(mat_asset_plus, this->rng);
+            mat_asset_minus = pnl_mat_copy( mat_asset_plus);
+            this->model->shift_asset(d, h, mat_asset_plus);
+            this->model->shift_asset(d, -h, mat_asset_minus);
+            pnl_mat_get_row(st_0, mat_asset_plus, 0);
 
             double payoff_plus = this->option->payOff(mat_asset_plus);
             double payoff_minus = this->option->payOff(mat_asset_minus);
 
-            double delta_j = (payoff_plus - payoff_minus) / (2 * h);
+            double delta_j = (payoff_plus - payoff_minus);
 
             // Accumulate delta and squared delta for variance calculation
             delta_sum += delta_j;
             delta_square_sum += delta_j * delta_j;
-        }
+        };
 
         // Calculate the mean delta
-        double delta_mean = delta_sum * exp(-r * T) / (M * pnl_vect_get(st_0, d));
+        std::cout << "h = " << h <<std::endl;
+        std::cout << "M = " << (double) M <<std::endl;
+        std::cout << "st_d = " << pnl_vect_get(st_0, d) <<std::endl;
+        std::cout << "kan9asmo iliha = " << ((2.0 * h) * (double)M * pnl_vect_get(st_0, d))<<std::endl;
+        double delta_mean = delta_sum * exp(-r * T) / ((2.0 * h) * (double)M * pnl_vect_get(st_0, d));
         pnl_vect_set(deltas_vect, d, delta_mean);
 
         // Calculate the standard deviation of delta
         double delta_var = (delta_square_sum / M - pow(delta_sum / M, 2)) * exp(-2 * r * T) / pow(pnl_vect_get(st_0, d), 2);
         double delta_stddev = sqrt(delta_var);
         pnl_vect_set(stddev_deltas_vect, d, delta_stddev);
-    }
+    };
 
     // Free allocated memory
-    pnl_mat_free(&original_assets);
     pnl_mat_free(&mat_asset_plus);
     pnl_mat_free(&mat_asset_minus);
     pnl_vect_free(&st_0);
@@ -202,13 +206,12 @@ void MonteCarlo::delta(PnlVect* deltas_vect, PnlVect* stddev_deltas_vect)
 }
 
 
-PnlVect* MonteCarlo::delta(const PnlMat *past, PnlVect* deltas_vect, PnlVect* stddev_deltas_vect, double t)
+void MonteCarlo::delta(PnlMat *past, PnlVect* deltas_vect, PnlVect* stddev_deltas_vect, double t)
 {
     /*
     Usage of the function
     BEFORE CALLING THE FUNCTION
     PnlVect* deltas_vect = pnl_vect_new();
-    PnlMat *past = pnl_mat_create(N + 1, D);
     PnlVect* stddev_deltas_vect = pnl_vect_new();
 
     delta(deltas_vect);
@@ -216,7 +219,6 @@ PnlVect* MonteCarlo::delta(const PnlMat *past, PnlVect* deltas_vect, PnlVect* st
     AFTER CALLING THE FUNCTION
     pnl_vect_free(&deltas_vect);
     pnl_vect_free(&stddev_deltas_vect);
-    pnl_mat_free(&past);
     */
     int D = this->option->option_size;   // Nb assets
     int M = this->sample_number;         // Nb Monte Carlo simulations
@@ -228,15 +230,14 @@ PnlVect* MonteCarlo::delta(const PnlMat *past, PnlVect* deltas_vect, PnlVect* st
     // last index based on time t
     int index = compute_last_index(t, T, N);
 
-    // Create original asset matrix
-    PnlMat *original_assets = pnl_mat_create(N + 1, D);
-    this->model->asset(past, t, original_assets, this->rng);
-
     // Create matrices for shifted assets
     PnlMat *mat_asset_plus = pnl_mat_create(N + 1, D);
     PnlMat *mat_asset_minus = pnl_mat_create(N + 1, D);
+    this->model->asset(past, t, mat_asset_plus, this->rng);
+    pnl_mat_clone(mat_asset_minus, mat_asset_plus);
+    
     PnlVect *st_i = pnl_vect_create(D);  // Holds the asset values at time t
-    pnl_mat_get_row(st_i, original_assets, index);
+    pnl_mat_get_row(st_i, mat_asset_plus, index);
 
     // Temporary vectors to store sums and squared sums for each delta
     PnlVect *deltas_sum = pnl_vect_create(D);
@@ -252,8 +253,8 @@ PnlVect* MonteCarlo::delta(const PnlMat *past, PnlVect* deltas_vect, PnlVect* st
         for (int j = 0; j < M; j++)
         {
             // Shift the asset for finite difference calculation
-            this->model->shift_asset(mat_asset_plus, d, t, h, original_assets);
-            this->model->shift_asset(mat_asset_minus, d, t, -h, original_assets);
+            this->model->shift_asset(d, t, h, mat_asset_plus);
+            this->model->shift_asset(d, t, -h, mat_asset_minus);
 
             // Calculate payoffs
             double payoff_plus = this->option->payOff(mat_asset_plus);
@@ -278,7 +279,6 @@ PnlVect* MonteCarlo::delta(const PnlMat *past, PnlVect* deltas_vect, PnlVect* st
     }
 
     // Free memory
-    pnl_mat_free(&original_assets);
     pnl_mat_free(&mat_asset_plus);
     pnl_mat_free(&mat_asset_minus);
     pnl_vect_free(&st_i);

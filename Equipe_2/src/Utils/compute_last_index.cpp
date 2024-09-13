@@ -1,5 +1,4 @@
-#include "utils.hpp"
-#include <cmath>
+#include "compute_last_index.hpp"
 
 double EPS = 1E-10;
 
