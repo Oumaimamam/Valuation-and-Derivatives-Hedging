@@ -48,3 +48,10 @@ target_link_libraries(nomExecutable
 )
 
 ```
+
+-   **Tests:**
+
+```bash
+python3  ./CheckArchive.py --check --extract --destdir=tests_rendu/rendu/  --build --pnldir=lib/pnl/build/  tests_rendu/Equipe_2.tar.gz
+python3 ./testForPCPD.py --price --exec=tests_rendu/rendu/Equipe_2/build/price0  --datadir=tests_rendu/data/  --outdir=tests_rendu/out
+```

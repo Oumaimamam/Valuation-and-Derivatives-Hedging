@@ -2,3 +2,4 @@ lib/
 pnl/
 .vscode/
 **/build/**
+**/out/**

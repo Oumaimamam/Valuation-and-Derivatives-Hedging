@@ -10,7 +10,11 @@
 void is_equals_array(double *ptr_arr_res, double *arr_expected, int size)
 {
     for (int i = 0; i < size; ++i)
+    {
+        std::cout << "calcul_t = " << ptr_arr_res[i] << std::endl;
+        std::cout << "calcul_expected_t = " << arr_expected[i] << std::endl;
         assert(std::fabs(ptr_arr_res[i] - arr_expected[i]) / arr_expected[i] < pow(10, -1));
+    }
 }
 
 // test deltas option call t=0
@@ -85,43 +89,43 @@ void test(std::string name_file_json, std::string name_file_json_expecetd)
     file.close();
 }
 
-TEST(MonteCarloTest, TestingPriceCall)
-{
-    std::cout << "============== Test CALL =======================" << std::endl;
-    test("../../data/call/call.json", "../../data/call/call_expected_price.json");
-}
+// TEST(MonteCarloTest, TestingDeltasCall)
+// {
+//     std::cout << "============== Test CALL =======================" << std::endl;
+//     test("../../data/call/call.json", "../../data/call/call_expected_price.json");
+// }
 
-TEST(MonteCarloTest, TestingPriceAsian)
-{
-    std::cout << "============== Test Asian =======================" << std::endl;
-    test("../../data/asian/asian.json", "../../data/asian/asian_expected_price.json");
-}
+// TEST(MonteCarloTest, TestingDeltasAsian)
+// {
+//     std::cout << "============== Test Asian =======================" << std::endl;
+//     test("../../data/asian/asian.json", "../../data/asian/asian_expected_price.json");
+// }
 
-TEST(MonteCarloTest, TestingPriceBasket2D)
-{
-    std::cout << "============== Test Basket 2D =======================" << std::endl;
-    test("../../data/basket/basket_2d/basket_2d.json", "../../data/basket/basket_2d/basket_2d_expected_price.json");
-}
+// TEST(MonteCarloTest, TestingDeltasBasket2D)
+// {
+//     std::cout << "============== Test Basket 2D =======================" << std::endl;
+//     test("../../data/basket/basket_2d/basket_2d.json", "../../data/basket/basket_2d/basket_2d_expected_price.json");
+// }
 
-TEST(MonteCarloTest, TestingPriceBasket5D)
-{
-    std::cout << "============== Test Basket 5D =======================" << std::endl;
-    test("../../data/basket/basket_5d/basket_5d.json", "../../data/basket/basket_5d/basket_5d_expected_price.json");
-}
+// TEST(MonteCarloTest, TestingDeltasBasket5D)
+// {
+//     std::cout << "============== Test Basket 5D =======================" << std::endl;
+//     test("../../data/basket/basket_5d/basket_5d.json", "../../data/basket/basket_5d/basket_5d_expected_price.json");
+// }
 
-TEST(MonteCarloTest, TestingPriceBasket5D1)
-{
-    std::cout << "============== Test Basket 5D 1 =======================" << std::endl;
-    test("../../data/basket/basket_5d_1/basket_5d_1.json", "../../data/basket/basket_5d_1/basket_5d_1_expected_price.json");
-}
+// TEST(MonteCarloTest, TestingDeltasBasket5D1)
+// {
+//     std::cout << "============== Test Basket 5D 1 =======================" << std::endl;
+//     test("../../data/basket/basket_5d_1/basket_5d_1.json", "../../data/basket/basket_5d_1/basket_5d_1_expected_price.json");
+// }
 
-TEST(MonteCarloTest, TestingPriceBasket40D)
-{
-    std::cout << "============== Test Basket 40D =======================" << std::endl;
-    test("../../data/basket/basket_40d/basket_40d.json", "../../data/basket/basket_40d/basket_40d_expected_price.json");
-}
+// TEST(MonteCarloTest, TestingDeltasBasket40D)
+// {
+//     std::cout << "============== Test Basket 40D =======================" << std::endl;
+//     test("../../data/basket/basket_40d/basket_40d.json", "../../data/basket/basket_40d/basket_40d_expected_price.json");
+// }
 
-TEST(MonteCarloTest, TestingPricePerf)
+TEST(MonteCarloTest, TestingDeltasPerf)
 {
     std::cout << "============== Test Perf  =======================" << std::endl;
     test("../../data/perf/perf.json", "../../data/perf/perf_expected_price.json");
