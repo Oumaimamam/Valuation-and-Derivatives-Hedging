@@ -10,12 +10,11 @@ BlackScholesModel::BlackScholesModel()
     this->spots = pnl_vect_new();
 }
 
-BlackScholesModel::BlackScholesModel(double rate, PnlVect *vol, PnlVect *spots, double corr, double H, double time_step)
+BlackScholesModel::BlackScholesModel(double rate, PnlVect *vol, PnlVect *spots, double corr, double time_step)
     : interest_rate(rate),
       volatility(vol),
       spots(spots),
       correlation(corr),
-      hedging_dates_number(H),
       time_step(time_step)
 {
     this->model_size = spots->size;
@@ -148,9 +147,9 @@ void BlackScholesModel::shift_asset(int d, double h, PnlMat *original_paths)
 {
     int nb_lines = original_paths->m;
 
-    for(int i = 1 ; i < nb_lines; i++)
+    for (int i = 1; i < nb_lines; i++)
     {
-        pnl_mat_set(original_paths, i, d, pnl_mat_get(original_paths, i, d)* (1+h));
+        pnl_mat_set(original_paths, i, d, pnl_mat_get(original_paths, i, d) * (1 + h));
     };
 }
 
@@ -160,8 +159,8 @@ void BlackScholesModel::shift_asset(int d, double t, double h, PnlMat *original_
     int T = this->time_step * nb_lines;
     int index = compute_last_index(t, T, nb_lines);
 
-    for(int i = index + 1 ; i < nb_lines; i++)
+    for (int i = index + 1; i < nb_lines; i++)
     {
-        pnl_mat_set(original_paths, i, d, pnl_mat_get(original_paths, i, d) * (1+h));
+        pnl_mat_set(original_paths, i, d, pnl_mat_get(original_paths, i, d) * (1 + h));
     };
 }

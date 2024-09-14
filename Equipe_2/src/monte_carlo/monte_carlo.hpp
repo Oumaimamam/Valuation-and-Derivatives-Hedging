@@ -15,14 +15,14 @@ public:
     int sample_number;
     double fd_step;
     PnlRng *rng;
-    int hedging_date_number;
+    int hedging_dates_number;
     // PricingResults res_price ;
     // HedgingResults  res_hedge ;
 
     // void get_all_dates(PnlVect *vect, double t, int i) const;
 
 public:
-    MonteCarlo(Option *option, BlackScholesModel *model, int N, int M, double h);
+    MonteCarlo(Option *option, BlackScholesModel *model, int N, int M, double H, double h);
     ~MonteCarlo();
     // calculer le price
     void price(double &price, double &price_std);

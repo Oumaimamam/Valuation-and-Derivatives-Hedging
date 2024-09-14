@@ -29,7 +29,7 @@ void get_cotations(double t, PnlMat *past, PnlMat *market_data, MonteCarlo *mont
     pnl_mat_free(&cots);
   */
 
-    int H = monte_carlo->model->hedging_dates_number;
+    int H = monte_carlo->hedging_dates_number;
     int N = monte_carlo->fixing_dates_number;
     double T = monte_carlo->option->maturity;
     int D = monte_carlo->option->option_size;

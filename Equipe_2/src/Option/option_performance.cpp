@@ -17,19 +17,18 @@ double OptionPerformance::payOff(PnlMat *matrix)
     double sum_d_2 = 0.0;
     double res = 0.0;
 
-    for(int i=1; i<rows; i++)
-    {   
-        pnl_mat_get_row(S1_ti,matrix,i-1);    //
-        sum_d_1 +=  pnl_vect_scalar_prod(this->payoff_coeffcients,S1_ti);
+    for (int i = 1; i < rows; i++)
+    {
+        pnl_mat_get_row(S1_ti, matrix, i - 1); //
+        sum_d_1 = pnl_vect_scalar_prod(this->payoff_coeffcients, S1_ti);
 
+        pnl_mat_get_row(S2_ti, matrix, i); //
+        sum_d_2 = pnl_vect_scalar_prod(this->payoff_coeffcients, S2_ti);
 
-        pnl_mat_get_row(S2_ti,matrix,i);    //
-        sum_d_2 +=  pnl_vect_scalar_prod(this->payoff_coeffcients,S2_ti);
-
-        res += std::max(sum_d_2/sum_d_1 - 1.0, 0.0);
+        res += std::max(sum_d_2 / sum_d_1 - 1.0, 0.0);
     }
-    
-    //free
+
+    // free
     pnl_vect_free(&S1_ti);
     pnl_vect_free(&S2_ti);
 
@@ -38,21 +37,21 @@ double OptionPerformance::payOff(PnlMat *matrix)
 
 OptionPerformance::~OptionPerformance() {}
 
-    // double res = 0;
-    // int rows = matrix->m; // D
-    // int cols = matrix->n; // N+1
+// double res = 0;
+// int rows = matrix->m; // D
+// int cols = matrix->n; // N+1
 
-    // for (int j = 1; j < cols; j++)
-    // {
-    //     double sum1 = 0;
-    //     double sum2 = 0;
-    //     double lamda_d;
-    //     for (int d = 0; d < rows; d++)
-    //     {
-    //         lamda_d = GET(payoff_coeffcients, d);
-    //         sum1 += lamda_d * pnl_mat_get(matrix, d, j);
-    //         sum2 += lamda_d * pnl_mat_get(matrix, d, j - 1);
-    //     }
+// for (int j = 1; j < cols; j++)
+// {
+//     double sum1 = 0;
+//     double sum2 = 0;
+//     double lamda_d;
+//     for (int d = 0; d < rows; d++)
+//     {
+//         lamda_d = GET(payoff_coeffcients, d);
+//         sum1 += lamda_d * pnl_mat_get(matrix, d, j);
+//         sum2 += lamda_d * pnl_mat_get(matrix, d, j - 1);
+//     }
 
-    //     res += std::max(sum1 / sum2 - 1, 0.0);
-    // }
+//     res += std::max(sum1 / sum2 - 1, 0.0);
+// }

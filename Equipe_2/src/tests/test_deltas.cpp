@@ -20,7 +20,7 @@ void get_cotations(double t, PnlMat *past, PnlMat *market_data, MonteCarlo *mont
     pnl_mat_free(&cots);
   */
 
-    int H = monte_carlo->model->hedging_dates_number;
+    int H = monte_carlo->hedging_dates_number;
     int N = monte_carlo->fixing_dates_number;
     double T = monte_carlo->option->maturity;
     int D = monte_carlo->option->option_size;
@@ -50,13 +50,14 @@ int main()
     MonteCarlo *monte_carlo = convert_json_to_monte_carlo("../../data/call/call.json");
 
     int option_size = monte_carlo->option->option_size;
-    PnlVect* deltas_vect = pnl_vect_create(option_size);
-    PnlVect* stddev_deltas_vect = pnl_vect_create(option_size);
+    PnlVect *deltas_vect = pnl_vect_create(option_size);
+    PnlVect *stddev_deltas_vect = pnl_vect_create(option_size);
     //////////// test deltas option call t=0 ////////////
     monte_carlo->delta(deltas_vect, stddev_deltas_vect);
 
     std::cout << "Deltas of the call option: ";
-    for (int i = 0; i < deltas_vect->size; i++) {
+    for (int i = 0; i < deltas_vect->size; i++)
+    {
         std::cout << pnl_vect_get(deltas_vect, i) << " ";
     }
     std::cout << std::endl;
@@ -64,11 +65,12 @@ int main()
     std::cout << "Expected deltas of the call option: 0.6314834286591736" << std::endl;
 
     std::cout << "Standard deviations of deltas: ";
-    for (int i = 0; i < stddev_deltas_vect->size; i++) {
+    for (int i = 0; i < stddev_deltas_vect->size; i++)
+    {
         std::cout << pnl_vect_get(stddev_deltas_vect, i) << " ";
     }
     std::cout << std::endl;
-    std::cout << "Expected standard deviations of deltas: 0.00234292944876985" << std::endl; 
+    std::cout << "Expected standard deviations of deltas: 0.00234292944876985" << std::endl;
     std::cout << std::endl;
 
     //////////// test deltas option call t=0.5 ////////////
@@ -77,13 +79,14 @@ int main()
     PnlMat *data = pnl_mat_create_from_file("../../data/call/call_market.txt");
     PnlMat *past = pnl_mat_new();
     get_cotations(t, past, data, monte_carlo);
-    PnlVect* deltas_vect_t = pnl_vect_create(option_size);
-    PnlVect* stddev_deltas_vect_t = pnl_vect_create(option_size);
+    PnlVect *deltas_vect_t = pnl_vect_create(option_size);
+    PnlVect *stddev_deltas_vect_t = pnl_vect_create(option_size);
 
     monte_carlo->delta(past, deltas_vect_t, stddev_deltas_vect_t, t);
 
     std::cout << "Deltas of the call option at t=0.5: ";
-    for (int i = 0; i < deltas_vect->size; i++) {
+    for (int i = 0; i < deltas_vect->size; i++)
+    {
         std::cout << pnl_vect_get(deltas_vect, i) << " ";
     }
     std::cout << std::endl;
@@ -91,13 +94,13 @@ int main()
     std::cout << "Expected deltas of the call option at t=0.5: 0.6314834286591736" << std::endl;
 
     std::cout << "Standard deviations of deltas at t=0.5: ";
-    for (int i = 0; i < stddev_deltas_vect->size; i++) {
+    for (int i = 0; i < stddev_deltas_vect->size; i++)
+    {
         std::cout << pnl_vect_get(stddev_deltas_vect, i) << " ";
     }
     std::cout << std::endl;
 
     std::cout << "Expected standard deviations of deltas at t=0.5: 0.00234292944876985" << std::endl;
-
 
     //////////// test deltas option basket t=2 ////////////
 
@@ -127,7 +130,6 @@ int main()
     // std::cout << " ] " << std::endl;
 
     // std::cout << "Expected standard deviations of deltas at t=2: [ 0.0011453870206614494, 0.0011452547039593089 ]," << std::endl;
-
 
     delete monte_carlo;
     // pnl_mat_free(&data_basket);

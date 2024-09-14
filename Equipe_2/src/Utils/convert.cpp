@@ -49,10 +49,9 @@ BlackScholesModel *convert_json_to_model(nlohmann::json json)
     PnlVect *vols;
     PnlVect *spots;
     double corr;
-    double H;
     double time_step;
     double T;
-    double N ;
+    double N;
 
     json.at("interest rate").get_to(r);
     json.at("option size").get_to(size);
@@ -67,14 +66,13 @@ BlackScholesModel *convert_json_to_model(nlohmann::json json)
         pnl_vect_resize_from_scalar(spots, size, GET(spots, 0));
     }
     json.at("correlation").get_to(corr);
-    json.at("hedging dates number").get_to(H);
 
     json.at("maturity").get_to(T);
     json.at("fixing dates number").get_to(N);
 
-    time_step = T/N;
+    time_step = T / N;
 
-    BlackScholesModel *model = new BlackScholesModel(r, vols, spots, corr, H,time_step );
+    BlackScholesModel *model = new BlackScholesModel(r, vols, spots, corr, time_step);
 
     return model;
 }
@@ -83,6 +81,7 @@ MonteCarlo *convert_json_to_monte_carlo(std::string file_path)
 {
     int N;
     int M;
+    double H;
     double h;
 
     std::ifstream file(file_path);
@@ -96,15 +95,13 @@ MonteCarlo *convert_json_to_monte_carlo(std::string file_path)
     json.at("fixing dates number").get_to(N);
     json.at("sample number").get_to(M);
     json.at("fd step").get_to(h);
+    json.at("hedging dates number").get_to(H);
 
     BlackScholesModel *model = convert_json_to_model(json);
     Option *option = convert_json_to_option(json);
 
-
-    MonteCarlo *monte_carlo = new MonteCarlo(option, model, N, M, h);
-    
+    MonteCarlo *monte_carlo = new MonteCarlo(option, model, N, M, H, h);
 
     file.close();
     return monte_carlo;
-
 }

@@ -30,7 +30,7 @@ void get_cotations(double t, PnlMat *past, PnlMat *market_data, MonteCarlo *mont
         exit(1);
     }
 
-    int H = monte_carlo->model->hedging_dates_number;
+    int H = monte_carlo->hedging_dates_number;
     int N = monte_carlo->fixing_dates_number;
     double T = monte_carlo->option->maturity;
     int D = monte_carlo->option->option_size;
@@ -61,7 +61,7 @@ void test(std::string name_file_json, std::string name_file_data)
     MonteCarlo *monte_carlo = convert_json_to_monte_carlo(name_file_json);
 
     double T;
-    double H = monte_carlo->model->hedging_dates_number;
+    double H = monte_carlo->hedging_dates_number;
     int D = monte_carlo->option->option_size;
     PnlVect *vect_st = pnl_vect_create(D);
     PnlMat *past = pnl_mat_new();

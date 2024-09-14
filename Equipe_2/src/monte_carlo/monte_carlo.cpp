@@ -4,11 +4,12 @@
 // #include "../Utils/construct_append_mat.hpp"
 #include "../Utils/utils.hpp"
 
-MonteCarlo::MonteCarlo(Option *option, BlackScholesModel *model, int N, int M, double h)
+MonteCarlo::MonteCarlo(Option *option, BlackScholesModel *model, int N, int M, double H, double h)
     : option(option),
       model(model),
       fixing_dates_number(N),
       sample_number(M),
+      hedging_dates_number(H),
       fd_step(h)
 {
     rng = pnl_rng_create(PNL_RNG_MERSENNE);
@@ -84,7 +85,7 @@ void MonteCarlo::price(double t, double &price, double &price_std, const PnlMat 
 
 void MonteCarlo::calculPAndL(PnlMat *market_data, double &p_and_l)
 {
-    double step = option->maturity / (double)this->model->hedging_dates_number; // step = T/H
+    double step = option->maturity / (double)this->hedging_dates_number; // step = T/H
     double r = model->interest_rate;
     double p;
     double price_stdev;
@@ -103,7 +104,7 @@ void MonteCarlo::calculPAndL(PnlMat *market_data, double &p_and_l)
 
     v = p - pnl_vect_scalar_prod(delta, model->spots);
 
-    for (int i = 1; i < hedging_date_number + 1; i++)
+    for (int i = 1; i < this->hedging_dates_number + 1; i++)
     {
         double t = i * step;
         pnl_mat_get_row(St_i, market_data, i); // sti
@@ -121,7 +122,7 @@ void MonteCarlo::calculPAndL(PnlMat *market_data, double &p_and_l)
     int D = this->option->option_size;
     PnlMat *matrix = pnl_mat_create(N + 1, D);
     pnl_mat_extract_subblock(matrix, past, 0, N + 1, 0, D);
-    p_and_l = v + pnl_vect_scalar_prod(delta, St_i) - option->payOff(past);
+    p_and_l = v + pnl_vect_scalar_prod(delta, St_i) - option->payOff(matrix);
 
     // free
     pnl_mat_free(&past);
@@ -288,7 +289,7 @@ void MonteCarlo::get_cotations(double t, PnlMat *cots, PnlMat *market_data)
         exit(1);
     }
 
-    int H = this->model->hedging_dates_number;
+    int H = this->hedging_dates_number;
     int N = fixing_dates_number;
     double T = option->maturity;
     int D = option->option_size;
