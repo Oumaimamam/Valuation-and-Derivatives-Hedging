@@ -17,15 +17,16 @@ double OptionPerformance::payOff(PnlMat *matrix)
     double sum_d_2 = 0.0;
     double res = 0.0;
 
-    for (int i = 1; i < rows; i++)
-    {
-        pnl_mat_get_row(S1_ti, matrix, i - 1); //
-        sum_d_1 = pnl_vect_scalar_prod(this->payoff_coeffcients, S1_ti);
+
+    for(int i=1; i<rows; i++)
+    {   
+        pnl_mat_get_row(S1_ti,matrix,i-1);    //
+        sum_d_1 =  pnl_vect_scalar_prod(this->payoff_coeffcients,S1_ti);
 
         pnl_mat_get_row(S2_ti, matrix, i); //
         sum_d_2 = pnl_vect_scalar_prod(this->payoff_coeffcients, S2_ti);
 
-        res += std::max(sum_d_2 / sum_d_1 - 1.0, 0.0);
+        res += std::max(sum_d_2/sum_d_1 - 1.0, 0.0);
     }
 
     // free
