@@ -22,8 +22,6 @@ MonteCarlo::~MonteCarlo()
     pnl_rng_free(&rng);
 }
 
-
-
 void MonteCarlo::price(double &price, double &price_std)
 {
 
@@ -55,7 +53,7 @@ void MonteCarlo::price(double &price, double &price_std)
     pnl_mat_free(&matrix);
 }
 
-void MonteCarlo::price(double t, double &price, double &price_std, const PnlMat *Past, PnlMat *matrix)
+void MonteCarlo::price(double t, double &price, double &price_std, const PnlMat *Past)
 {
 
     int D = this->option->option_size;
@@ -67,11 +65,10 @@ void MonteCarlo::price(double t, double &price, double &price_std, const PnlMat 
     double v_t = 0.0;
     double price_std_dev = 0.0;
 
-    pnl_mat_resize(matrix, N + 1, D);
+    PnlMat *matrix = pnl_mat_create(N + 1, D);
 
     for (int i = 0; i < M; i++)
     {
-        // get_matrix_of_sim(t , matrix);
         this->model->asset(Past, t, matrix, this->rng);
         double phi_j = this->option->payOff(matrix);
         v_t += phi_j;
@@ -83,65 +80,58 @@ void MonteCarlo::price(double t, double &price, double &price_std, const PnlMat 
     price = std::exp(-r * (T - t)) * inv_M * v_t;
 
     price_std = sqrt(exp(-2 * r * T) * (inv_M * price_std_dev - pow(inv_M * v_t, 2))) / sqrt(M);
-
 }
 
-void MonteCarlo::MonteCarlo::get_delta(PnlVect *Vect)
+void MonteCarlo::calculPAndL(PnlMat *market_data, double &p_and_l)
 {
-    return;
-}
-
-void MonteCarlo::getCouvPrtf(PnlMat *Past, PnlMat *market_data, double &p_and_l, double t)
-{
-    double step = option->maturity / (double)fixing_dates_number; // step = T/H
+    double step = option->maturity / (double)this->model->hedging_dates_number; // step = T/H
     double r = model->interest_rate;
     double p;
     double price_stdev;
     double v;
-    // double p_and_l;
-    // double t;
+
     PnlMat *past = pnl_mat_new();
     PnlVect *St_i = pnl_vect_new();
-    PnlVect *delta = pnl_vect_create(model->model_size);   // deltai
-    PnlVect *delta_1 = pnl_vect_create(model->model_size); // delta{i+1}
-    PnlVect *calcul = pnl_vect_create(model->model_size);  // pour contenir le la difference
-    PnlMat *matrix = pnl_mat_new();
+    PnlVect *delta = pnl_vect_create(model->model_size);       // deltai
+    PnlVect *delta_stdev = pnl_vect_create(model->model_size); // std_dev
+    PnlVect *delta_1 = pnl_vect_create(model->model_size);     // delta{i+1}
 
+    //
     // traitement de ti = 0
-    get_delta(delta);
     price(p, price_stdev);
+    this->delta(delta, delta_stdev);
 
     v = p - pnl_vect_scalar_prod(delta, model->spots);
 
     for (int i = 1; i < hedging_date_number + 1; i++)
     {
-        t = i * step;
-        pnl_mat_get_row(St_i, market_data, t); // sti
-        // calcul de pi
-        get_cotations(t, Past, market_data);
-        // b contient pi
-        price(t, p, price_stdev, Past, matrix);
+        double t = i * step;
+        pnl_mat_get_row(St_i, market_data, i); // sti
 
         // delta_i
-        get_delta(delta_1);
-        pnl_vect_minus_vect(delta, delta_1); // delta{i-1} - delta{i}
+        get_cotations(t, past, market_data);
+        this->delta(past, delta_1, delta_stdev, t);
+        pnl_vect_minus_vect(delta, delta_1); // delat <- delta{i-1} - delta{i}
         v = v * exp(r * step) + pnl_vect_scalar_prod(delta, St_i);
         pnl_vect_clone(delta, delta_1);
     }
 
     // l'erreur de couverture
-    p_and_l = v + pnl_vect_scalar_prod(delta, St_i) - option->payOff(matrix);
+    int N = this->fixing_dates_number;
+    int D = this->option->option_size;
+    PnlMat *matrix = pnl_mat_create(N + 1, D);
+    pnl_mat_extract_subblock(matrix, past, 0, N + 1, 0, D);
+    p_and_l = v + pnl_vect_scalar_prod(delta, St_i) - option->payOff(past);
 
     // free
-    pnl_mat_free(&Past);
+    pnl_mat_free(&past);
     pnl_vect_free(&St_i);
     pnl_vect_free(&delta);
     pnl_vect_free(&delta_1);
-    pnl_vect_free(&calcul);
-    pnl_mat_free(&matrix);
+    pnl_vect_free(&delta_stdev);
 }
 
-void MonteCarlo::delta(PnlVect* deltas_vect, PnlVect* stddev_deltas_vect)
+void MonteCarlo::delta(PnlVect *deltas_vect, PnlVect *stddev_deltas_vect)
 {
     // delta of the option at time t = 0
     int D = this->option->option_size;
@@ -154,7 +144,7 @@ void MonteCarlo::delta(PnlVect* deltas_vect, PnlVect* stddev_deltas_vect)
     PnlMat *mat_asset_plus = pnl_mat_create(N + 1, D);
     PnlMat *mat_asset_minus = pnl_mat_create(N + 1, D);
     PnlVect *st_0 = pnl_vect_create(D);
-    
+
     PnlVect *deltas_sum = pnl_vect_create(D);
     PnlVect *deltas_square_sum = pnl_vect_create(D);
 
@@ -167,11 +157,11 @@ void MonteCarlo::delta(PnlVect* deltas_vect, PnlVect* stddev_deltas_vect)
         for (int j = 0; j < M; j++)
         {
             this->model->asset(mat_asset_plus, this->rng);
-            mat_asset_minus = pnl_mat_copy( mat_asset_plus);
+            mat_asset_minus = pnl_mat_copy(mat_asset_plus);
             pnl_mat_get_row(st_0, mat_asset_plus, 0);
             this->model->shift_asset(d, h, mat_asset_plus);
             this->model->shift_asset(d, -h, mat_asset_minus);
-            
+
             double payoff_plus = this->option->payOff(mat_asset_plus);
             double payoff_minus = this->option->payOff(mat_asset_minus);
 
@@ -187,7 +177,7 @@ void MonteCarlo::delta(PnlVect* deltas_vect, PnlVect* stddev_deltas_vect)
 
         // Calculate the standard deviation of delta
         double delta_var = (delta_square_sum / M - pow(delta_sum / M, 2)) * exp(-2 * r * T) / pow(2.0 * h * pnl_vect_get(st_0, d), 2);
-        double delta_std_dev = sqrt(delta_var)/sqrt(M);
+        double delta_std_dev = sqrt(delta_var) / sqrt(M);
         pnl_vect_set(stddev_deltas_vect, d, delta_std_dev);
     };
 
@@ -199,8 +189,7 @@ void MonteCarlo::delta(PnlVect* deltas_vect, PnlVect* stddev_deltas_vect)
     pnl_vect_free(&deltas_square_sum);
 }
 
-
-void MonteCarlo::delta(PnlMat *past, PnlVect* deltas_vect, PnlVect* stddev_deltas_vect, double t)
+void MonteCarlo::delta(PnlMat *past, PnlVect *deltas_vect, PnlVect *stddev_deltas_vect, double t)
 {
     /*
     Usage of the function
@@ -214,21 +203,20 @@ void MonteCarlo::delta(PnlMat *past, PnlVect* deltas_vect, PnlVect* stddev_delta
     pnl_vect_free(&deltas_vect);
     pnl_vect_free(&stddev_deltas_vect);
     */
-    int D = this->option->option_size;   // Nb assets
-    int M = this->sample_number;         // Nb Monte Carlo simulations
-    int N = this->fixing_dates_number;   // Nb fixing dates
-    double h = this->fd_step;            // Finite difference step size
+    int D = this->option->option_size; // Nb assets
+    int M = this->sample_number;       // Nb Monte Carlo simulations
+    int N = this->fixing_dates_number; // Nb fixing dates
+    double h = this->fd_step;          // Finite difference step size
     double r = this->model->interest_rate;
     double T = this->option->maturity;
-    
+
     // last index based on time t
     int index = compute_last_index(t, T, N);
 
     // Create matrices for shifted assets
     PnlMat *mat_asset_plus = pnl_mat_create(N + 1, D);
     PnlMat *mat_asset_minus = pnl_mat_create(N + 1, D);
-    PnlVect *st_i = pnl_vect_create(D);  // Holds the asset values at time t
-    
+    PnlVect *st_i = pnl_vect_create(D); // Holds the asset values at time t
 
     // Temporary vectors to store sums and squared sums for each delta
     PnlVect *deltas_sum = pnl_vect_create(D);
@@ -262,12 +250,12 @@ void MonteCarlo::delta(PnlMat *past, PnlVect* deltas_vect, PnlVect* stddev_delta
         }
 
         // mean delta
-        double delta_mean = delta_sum * exp(-r * (T - t)) / ((2 * h)* M * pnl_vect_get(st_i, d));
+        double delta_mean = delta_sum * exp(-r * (T - t)) / ((2 * h) * M * pnl_vect_get(st_i, d));
         pnl_vect_set(deltas_vect, d, delta_mean);
 
         // variance and standard deviation
         double delta_var = (delta_square_sum / M - pow(delta_sum / M, 2)) * exp(-2 * r * (T - t)) / pow(2.0 * h * pnl_vect_get(st_i, d), 2);
-        double delta_std_dev = sqrt(delta_var)/sqrt((double)M);
+        double delta_std_dev = sqrt(delta_var) / sqrt((double)M);
         pnl_vect_set(stddev_deltas_vect, d, delta_std_dev);
     }
 
@@ -278,57 +266,6 @@ void MonteCarlo::delta(PnlMat *past, PnlVect* deltas_vect, PnlVect* stddev_delta
     pnl_vect_free(&deltas_sum);
     pnl_vect_free(&deltas_square_sum);
 }
-
-
-// void MonteCarlo::get_matrix_of_sim(double t , PnlMat *matrix)
-// {
-
-//     double T = this->option->maturity;
-//     int N = this->fixing_dates_number;
-//     int index = compute_last_index(t, T, N);
-//     int D = this->option->option_size;
-
-//     PnlVect *dates = pnl_vect_new();
-//     get_all_dates(dates, t, index);
-
-//     PnlMat *matrix_sim = pnl_mat_create(D, N - index);
-
-//     if (t == 0.0)
-//     {
-//         this->model->asset(t, dates, matrix_sim);
-//         pnl_mat_set_col(matrix , this->model->spots , 0);
-//         pnl_mat_set_subblock(matrix, matrix_sim, 0, index + 1);
-
-//     }
-//     else
-//     {
-//         PnlVect *s_t = pnl_vect_new();
-//         PnlMat *cots = pnl_mat_new();
-//         get_cotations(t, cots, s_t);
-
-//         PnlVect *col = pnl_vect_create(D);
-
-//         this->model->asset(t, dates, matrix_sim);
-
-//         for (int j = 0; j < N - index; j++)
-//         {
-//             pnl_mat_get_col(col, matrix_sim, j);
-//             pnl_vect_mult_vect_term(col, s_t);
-//             pnl_mat_set_col(matrix_sim, col, j);
-//         }
-
-//         pnl_mat_set_subblock(matrix, cots, 0, 0);
-//         pnl_mat_set_subblock(matrix, matrix_sim, 0, index + 1);
-
-//         pnl_vect_free(&col);
-//         pnl_vect_free(&s_t);
-//         pnl_mat_free(&cots);
-//     }
-
-//     pnl_mat_free(&matrix_sim);
-//     pnl_vect_free(&dates);
-
-// }
 
 void MonteCarlo::get_cotations(double t, PnlMat *cots, PnlMat *market_data)
 {
@@ -351,7 +288,7 @@ void MonteCarlo::get_cotations(double t, PnlMat *cots, PnlMat *market_data)
         exit(1);
     }
 
-    int H = hedging_date_number;
+    int H = this->model->hedging_dates_number;
     int N = fixing_dates_number;
     double T = option->maturity;
     int D = option->option_size;

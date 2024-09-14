@@ -100,43 +100,9 @@ target_link_libraries(test_convert
 
 
 
-# Test Monte Carlo : src/monte_carlo/*.cpp
-add_executable(test_monte_carlo src/tests/test_monte_carlo.cpp)
-target_link_libraries(test_monte_carlo
-    my_lib
-    ${PNL_LIBRARIES}
-    nlohmann_json::nlohmann_json
-    ${GTEST_LIBRARIES}
-    gtest_main
-    pthread
-)
-
-# Test Option: src/option/*.cpp
-add_executable(test_option src/tests/test_option.cpp)
-target_link_libraries(test_option
-    my_lib
-    ${PNL_LIBRARIES}
-    nlohmann_json::nlohmann_json
-    ${GTEST_LIBRARIES}
-    gtest_main
-    pthread
-)
-
-
-# Test black_scholes_model : src/black_scholes_model/*.cpp
-add_executable(test_black_scholes_model src/tests/test_black_scholes_model.cpp)
-target_link_libraries(test_black_scholes_model
-    my_lib
-    ${PNL_LIBRARIES}
-    nlohmann_json::nlohmann_json
-    ${GTEST_LIBRARIES}
-    gtest_main
-    pthread
-)
-
-# Test Pricer : 
-add_executable(test_pricer src/tests/test_pricer.cpp)
-target_link_libraries(test_pricer
+# Test Pricer à t = 0: 
+add_executable(test_pricer_0 src/tests/test_pricer_0.cpp)
+target_link_libraries(test_pricer_0
     my_lib
     ${PNL_LIBRARIES}
     nlohmann_json::nlohmann_json
@@ -155,6 +121,18 @@ target_link_libraries(test_pricer_t
     gtest_main
     pthread
 )
+
+# Test Deltas : 
+add_executable(test_deltas_0 src/tests/test_deltas_0.cpp)
+target_link_libraries(test_deltas_0
+    my_lib
+    ${PNL_LIBRARIES}
+    nlohmann_json::nlohmann_json
+    ${GTEST_LIBRARIES}
+    gtest_main
+    pthread
+)
+
 
 # Test Deltas : 
 add_executable(test_deltas src/tests/test_deltas.cpp)
@@ -190,6 +168,18 @@ target_link_libraries(price0
     gtest_main
     pthread
 )
+
+# hedge :  
+add_executable(hedge src/hedge.cpp)
+target_link_libraries(hedge
+    my_lib
+    ${PNL_LIBRARIES}
+    nlohmann_json::nlohmann_json
+    ${GTEST_LIBRARIES}
+    gtest_main
+    pthread
+)
+
 
 
 # Print compiler flags

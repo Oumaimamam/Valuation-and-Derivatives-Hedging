@@ -6,16 +6,8 @@
 #include "../monte_carlo/monte_carlo.hpp"
 #include "../Utils/convert.hpp"
 #include "../Utils/utils.hpp"
-
-double calcul_vt_expected(double t, double s_t, double k, double r, double T, double sigma)
-{
-    double d_1 = (std::log(s_t / k) + (r + pow(sigma, 2)) * (T - t)) / (sigma * sqrt(T - t));
-    double d_2 = d_1 - sigma * sqrt(T - t);
-
-    double v_t = s_t * pnl_cdfnor(d_1) - k * exp(-r * (T - t)) * pnl_cdfnor(d_2);
-
-    return v_t;
-}
+#include <cmath>
+#include <gtest/gtest.h>
 
 void get_cotations(double t, PnlMat *past, PnlMat *market_data, MonteCarlo *monte_carlo)
 {
@@ -63,49 +55,80 @@ void get_cotations(double t, PnlMat *past, PnlMat *market_data, MonteCarlo *mont
     pnl_vect_free(&col);
 }
 
-int main()
+void test(std::string name_file_json, std::string name_file_data)
 {
-    MonteCarlo *monte_carlo = convert_json_to_monte_carlo("../../data/call/call.json");
+    PnlMat *data = pnl_mat_create_from_file(name_file_data.c_str());
+    MonteCarlo *monte_carlo = convert_json_to_monte_carlo(name_file_json);
 
-    double K = monte_carlo->option->strike;
-    double r = monte_carlo->model->interest_rate;
-    double T = monte_carlo->option->maturity;
-    double sigma = monte_carlo->model->volatility->array[0];
-
+    double T;
     double H = monte_carlo->model->hedging_dates_number;
-    int i = 10;
-    double t = i * T / H;
-
-    PnlMat *data = pnl_mat_create_from_file("../../data/call/call_market.txt");
-
-    PnlMat *past = pnl_mat_new();
-
-    get_cotations(t, past, data, monte_carlo);
-
     int D = monte_carlo->option->option_size;
     PnlVect *vect_st = pnl_vect_create(D);
-    pnl_mat_get_row(vect_st, past, past->m - 1);
+    PnlMat *past = pnl_mat_new();
 
-    double s_t = vect_st->array[0]; // s_t , D = 1
-
-    // v_t expected :
-
-    double v_t_expected = calcul_vt_expected(t, s_t, K, r, T, sigma);
-
-    // calcul du v_t (pricer) :
-    PnlMat *matrix = pnl_mat_new();
+    double t;
     double v_t;
     double v_t_std;
-    monte_carlo->price(t, v_t, v_t_std, past, matrix);
+    double v_t_expected;
+    double v_t_expected_std;
 
-    std::cout << "v_t  =" << v_t << std::endl;
-    std::cout << "v_t_expected  =" << v_t_expected << std::endl;
+    for (int i = 0; i < H + 1; i++)
+    {
+        monte_carlo = convert_json_to_monte_carlo(name_file_json);
+        T = monte_carlo->option->maturity;
+        t = i * T / H;
+        get_cotations(t, past, data, monte_carlo);
+
+        pnl_mat_get_row(vect_st, past, past->m - 1);
+        // v_t expected :
+
+        // calcul du v_t (pricer) :
+        monte_carlo->price(t, v_t, v_t_std, past);
+
+        // calcul du v_t expected
+        monte_carlo->option->maturity = T - t;
+        monte_carlo->model->spots = vect_st;
+        monte_carlo->price(v_t_expected, v_t_expected_std);
+
+        std::cout << "i  =" << i << std::endl;
+        std::cout << "t  =" << t << std::endl;
+        std::cout << "v_t  =" << v_t << std::endl;
+        std::cout << "v_t_expected  =" << v_t_expected << std::endl;
+
+        assert(std::fabs(v_t - v_t_expected) / v_t_expected < pow(10, -1));
+        std::cout << "\033[32m";
+        std::cout << "PASSED" << std::endl;
+        std::cout << "\033[0m";
+        std::cout << "------------------------------------------------------------------------------------" << std::endl;
+    }
 
     pnl_mat_free(&data);
     pnl_mat_free(&past);
     pnl_vect_free(&vect_st);
-    pnl_mat_free(&matrix);
     delete monte_carlo;
+}
 
-    return 0;
+TEST(MonteCarloTest, TestingPriceCall)
+{
+    test("../../data/call/call.json", "../../data/call/call_market.txt");
+}
+
+TEST(MonteCarloTest, TestingPriceBasket2D)
+{
+    test("../../data/basket/basket_2d/basket_2d.json", "../../data/basket/basket_2d/basket_2d_market.txt");
+}
+
+TEST(MonteCarloTest, TestingPriceBasket5D)
+{
+    test("../../data/basket/basket_5d/basket_5d.json", "../../data/basket/basket_5d/basket_5d_market.txt");
+}
+
+TEST(MonteCarloTest, TestingPriceBasket5D1)
+{
+    test("../../data/basket/basket_5d_1/basket_5d_1.json", "../../data/basket/basket_5d_1/basket_5d_1_market.txt");
+}
+
+TEST(MonteCarloTest, TestingPriceBasket40D)
+{
+    test("../../data/basket/basket_40d/basket_40d.json", "../../data/basket/basket_40d/basket_40d_market.txt");
 }
