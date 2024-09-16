@@ -36,6 +36,8 @@ public:
     void delta(PnlVect *deltas_vect, PnlVect *stddev_deltas_vect);
     // void getCouvPrtf(PnlMat *Past, PnlMat *market_data, double &p_and_l, double t);
     void calculPAndL(PnlMat *market_data, double &p_and_l);
+    void deltaCall(PnlVect *St_i, double t, PnlVect *delta);
+
 };
 
 #endif

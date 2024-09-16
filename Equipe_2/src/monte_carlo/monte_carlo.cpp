@@ -3,6 +3,7 @@
 #include "../Utils/convert.hpp"
 // #include "../Utils/construct_append_mat.hpp"
 #include "../Utils/utils.hpp"
+#include "pnl/pnl_cdf.h"
 
 MonteCarlo::MonteCarlo(Option *option, BlackScholesModel *model, int N, int M, double H, double h)
     : option(option),
@@ -101,7 +102,9 @@ void MonteCarlo::calculPAndL(PnlMat *market_data, double &p_and_l)
     //
     // traitement de ti = 0
     price(p, price_stdev);
-    this->delta(delta, delta_stdev);
+    // deltaCall(PnlVect *St_i, double t, PnlVect *deltan)
+    deltaCall(model->spots, 0.0,delta);
+    // this->delta(delta, delta_stdev);
 
     v = p - pnl_vect_scalar_prod(delta, model->spots);
 
@@ -112,7 +115,8 @@ void MonteCarlo::calculPAndL(PnlMat *market_data, double &p_and_l)
 
         // delta_i
         get_cotations(t, past, market_data);
-        this->delta(past, delta_1, delta_stdev, t);
+        // this->delta(past, delta_1, delta_stdev, t);
+        deltaCall(St_i,t, delta_1);
         pnl_vect_minus_vect(delta, delta_1); // delat <- delta{i-1} - delta{i}
         v = v * exp(r * step) + pnl_vect_scalar_prod(delta, St_i);
         pnl_vect_clone(delta, delta_1);
@@ -191,6 +195,37 @@ void MonteCarlo::delta(PnlVect *deltas_vect, PnlVect *stddev_deltas_vect)
     pnl_vect_free(&deltas_square_sum);
 }
 
+
+void MonteCarlo::deltaCall(PnlVect *St_i, double t, PnlVect *delta)
+{
+    // std::cout<<"correlation :  "<<model->volatility<<std::endl;
+    // std::cout<<"T :  "<<option->maturity<<std::endl;
+    // std::cout<<"t :  "<<t<<std::endl;
+    // std::cout<<"racine :  "<<sqrt(option->maturity - t)<<std::endl;
+    
+    // std::cout<<"----------------vect volatility -------------"<<std::endl;
+    // pnl_vect_print(model->volatility);
+
+    double inf = (GET(model->volatility,0) * sqrt(option->maturity - t));
+    // std::cout<<"inf :  "<<inf<<std::endl;
+
+    double d1 = (log(GET(St_i,0)/option->strike) + (model->interest_rate + pow(GET(model->volatility,0),2)/2)*(option->maturity - t))/inf;
+    // std::cout<<"la  valeur de d1 "<<d1<<std::endl;
+
+    // d1 = d1/(model->correlation * sqrt(option->maturity - t));
+    // std::cout<<"la deuxième valeur de d1 "<<d1<<std::endl;
+    // std::cout<<"-----------------la valeur de St -------------"<<std::endl;
+    // pnl_vect_print(St_i);
+    // std::cout<<"-----------------vect delta avant le remplissage -------------"<<std::endl;
+    // pnl_vect_print(delta);
+    // std::cout<<"ln(S/K) :  "<<log(GET(St_i,0)/option->strike)<<std::endl;
+    // std::cout<<"d1 :  "<<d1<<std::endl;
+    // std::cout<<"N(d1) :  "<<pnl_cdfnor(d1)<<std::endl;
+    // std::cout<<"racine :  "<<sqrt(option->maturity - t)<<std::endl;
+    pnl_vect_set(delta,0,pnl_cdfnor(d1));
+    // std::cout<<"-----------------vect delta après le remplissage -------------"<<std::endl;
+    // pnl_vect_print(delta);
+}
 void MonteCarlo::delta(PnlMat *past, PnlVect *deltas_vect, PnlVect *stddev_deltas_vect, double t)
 {
     /*
