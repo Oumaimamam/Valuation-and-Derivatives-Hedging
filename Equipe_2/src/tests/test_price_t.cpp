@@ -93,10 +93,10 @@ void test(std::string name_file_json, std::string name_file_data)
         pnl_vect_clone(monte_carlo->model->spots, vect_st);
         monte_carlo->price(v_t_expected, v_t_expected_std);
 
-        // std::cout << "i  =" << i << std::endl;
-        // std::cout << "t  =" << t << std::endl;
-        // std::cout << "v_t  =" << v_t << std::endl;
-        // std::cout << "v_t_expected  =" << v_t_expected << std::endl;
+        std::cout << "i  =" << i << std::endl;
+        std::cout << "t  =" << t << std::endl;
+        std::cout << "v_t  =" << v_t << std::endl;
+        std::cout << "v_t_expected  =" << v_t_expected << std::endl;
 
         assert(std::fabs(v_t - v_t_expected) / v_t_expected < pow(10, -1));
     }
@@ -110,6 +110,7 @@ void test(std::string name_file_json, std::string name_file_data)
     pnl_mat_free(&past);
     pnl_vect_free(&vect_st);
     pnl_vect_free(&spots_const);
+    
 }
 
 TEST(MonteCarloTest, TestingPriceCall)

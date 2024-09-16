@@ -13,6 +13,7 @@ public:
     double correlation;
     int model_size;
     double time_step;
+    PnlMat *L;
 
 public:
     BlackScholesModel();
