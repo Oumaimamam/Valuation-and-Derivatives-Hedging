@@ -32,5 +32,6 @@ void test(std::string name_file_json, std::string name_file_data, std::string na
 int main()
 {
     test("../../data/call/call.json", "../../data/call/call_market.txt", "../../data/call/call_expected_hedge.json");
+    // test("../../data/asian/asian.json", "../../data/asian/asian_market.txt", "../../data/asian/asian_expected_hedge.json");
     return 0;
 }
