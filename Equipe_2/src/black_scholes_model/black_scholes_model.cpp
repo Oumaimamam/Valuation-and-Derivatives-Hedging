@@ -179,15 +179,6 @@ void BlackScholesModel::get_matrix_Cholesky_corr(PnlMat *matrix_chol)
     pnl_mat_chol(matrix_chol);
 }
 
-void BlackScholesModel::shift_asset(int d, double h, PnlMat *original_paths)
-{
-    int nb_lines = original_paths->m;
-
-    for (int i = 0; i < nb_lines; i++)
-    {
-        pnl_mat_set(original_paths, i, d, pnl_mat_get(original_paths, i, d) * (1 + h));
-    };
-}
 
 void BlackScholesModel::shift_asset(int d, double t, double h, PnlMat *original_paths)
 {

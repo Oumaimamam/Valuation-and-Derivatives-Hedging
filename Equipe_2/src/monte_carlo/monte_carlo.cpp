@@ -168,8 +168,8 @@ void MonteCarlo::delta(PnlVect *deltas_vect, PnlVect *stddev_deltas_vect)
             this->model->asset(mat_asset_plus, this->rng);
             pnl_mat_clone(mat_asset_minus, mat_asset_plus);
             // pnl_mat_get_row(st_0, mat_asset_plus, 0);
-            this->model->shift_asset(d, h, mat_asset_plus);
-            this->model->shift_asset(d, -h, mat_asset_minus);
+            this->model->shift_asset(d, 0.0, h, mat_asset_plus);
+            this->model->shift_asset(d, 0.0,  -h, mat_asset_minus);
 
             double payoff_plus = this->option->payOff(mat_asset_plus);
             double payoff_minus = this->option->payOff(mat_asset_minus);

@@ -8,6 +8,7 @@ int main(int argc, char *argv[])
     if (argc != 3)
     {
         std::cout << "Le nombre d'arguments attendu est 3" << std::endl;
+        exit(1);
     }
 
     MonteCarlo *monte_carlo = convert_json_to_monte_carlo(argv[1]);
