@@ -11,27 +11,22 @@ double OptionPerformance::payOff(PnlMat *matrix)
 {
     int rows = matrix->m; // N+1
     int cols = matrix->n; // D
-    PnlVect *S_ti = pnl_vect_create(cols);
-    // PnlVect *S2_ti = pnl_vect_create(cols);
-    double sum_d_1 = 0.0;
-    double sum_d_2 = 0.0;
+    PnlVect *S1_ti = pnl_vect_create(cols);
+    double sum_prec = 0.0;
+    double sum_curr = 0.0;
     double res = 0.0;
-
-
-    for(int i=1; i<rows; i++)
-    {   
-        pnl_mat_get_row(S_ti,matrix,i-1);    //
-        sum_d_1 =  pnl_vect_scalar_prod(this->payoff_coeffcients,S_ti);
-
-        pnl_mat_get_row(S_ti, matrix, i); //
-        sum_d_2 = pnl_vect_scalar_prod(this->payoff_coeffcients, S_ti);
-
-        res += std::max(sum_d_2/sum_d_1 - 1.0, 0.0);
+    pnl_mat_get_row(S1_ti, matrix, 0); //
+    sum_prec = pnl_vect_scalar_prod(this->payoff_coeffcients, S1_ti);
+    for (int i = 1; i < rows; i++)
+    {
+        pnl_mat_get_row(S1_ti, matrix, i); //
+        sum_curr = pnl_vect_scalar_prod(this->payoff_coeffcients, S1_ti);
+        res += std::max(sum_curr / sum_prec - 1.0, 0.0);
+        sum_prec = sum_curr;
     }
 
     // free
-    pnl_vect_free(&S_ti);
-    // pnl_vect_free(&S2_ti);
+    pnl_vect_free(&S1_ti);
 
     return 1 + res;
 }
