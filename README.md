@@ -1,6 +1,6 @@
 # Projet : Couverture de Produits dérivés
 
-## 0. **Objectif:**
+## 1. **Objectif:**
 
 Un projet de pricing et de couverture en Delta de produits dérivés: Options (Basket, Performance, Asian).
 
@@ -26,7 +26,7 @@ $$
 
 
 
-## 1. **Env du Dev:**
+## 2. **Env du Dev:**
 
 -   **Installation du `PNL`:**
 
