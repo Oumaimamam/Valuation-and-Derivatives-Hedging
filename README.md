@@ -1,48 +1,47 @@
-# Projet : Couverture de Produits dérivés
+# Project: Derivatives Hedging
 
-## 1. **Objectif:**
+## 1. **Objective:**
 
-Un projet de pricing et de couverture en Delta de produits dérivés: Options (Basket, Performance, Asian).
+A project for pricing and Delta hedging of derivatives: Options (Basket, Performance, Asian).
 
-### - **Le pricing:**
+### - **Pricing:**
 
-On modélise la dynamique de diffusion du sous-jacent par un modèle de Black-Scholes :
+We model the diffusion dynamics of the underlying asset using a Black-Scholes model:
 
 $$
 S_{t,d} = S_{0,d} e^{\left(r - \frac{\sigma_d^2}{2}\right)t + \sigma_d B_{t,d}}, \quad d = 1, \dots, D
 $$
 
-On estime ensuite le prix de l'option par **Monte Carlo**.
+The option price is then estimated using **Monte Carlo**.
 
-### - **La couverture:**
+### - **Hedging:**
 
-On utilise une couverture en delta pour nos stratégies. Ceci dit qu'on calcule les sensibilités (deltas) du prix de l'option par rapport au sous-jacent, pour construire un portefeuille de couverture avec des quantités delta de chacun des actifs sous-jacents.
+We use Delta hedging for our strategies. This means calculating the sensitivities (deltas) of the option price with respect to the underlying asset to construct a hedging portfolio with delta quantities of each underlying asset.
 
-Les deltas :
+The deltas are calculated as:
 
 $$
 \frac{\partial v(t, S_{t_0}, \dots, S_{t_i}, S_t)}{\partial S_t}
 $$
 
 
+## 2. **Development Environment:**
 
-## 2. **Env du Dev:**
-
--   **Installation du `PNL`:**
+-   **Installation of `PNL` library:**
 
 ```bash
 mkdir lib
 cd lib
 cp /relative/path/to/pnl ./
 mkdir build
-cd  build
+cd build
 cmake ..
 chmod +x ../split_linker_command.sh
 make
 make install
 ```
 
--   **Installation du `nlohmann-json`:**
+-  **Installation of `nlohmann-json` library:**
 
 ```bash
 sudo apt update
@@ -65,12 +64,12 @@ make
 ./hedge market_file.txt data_input.json
 ```
 
--   **configuration vscode:**
+-   **vscode configuration:**
 
     -   Ouvrir le fichier `c_cpp_properties.json`
     -   Ajouter dans `includePath`: **`"relative/path/to/lib/pnl/build/include/"`**
 
--   **Ajouter un executable dans `CMakeLists.txt`:**
+-   **Add executable in `CMakeLists.txt`:**
 
 ```Makefile
 add_executable(nomExecutable _liste_des_fichiers_cpp)
