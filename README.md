@@ -1,8 +1,8 @@
-# Projet : Couverture de Porduits dérivés
+# Projet : Couverture de Produits dérivés
 
 ## 0. **Objectif:**
 
-Un projet de pricing et de couverture en Delta de produits dérivés (options: Basket, Performance, Asian).
+Un projet de pricing et de couverture en Delta de produits dérivés: Options (Basket, Performance, Asian).
 
 ### - **Le pricing:**
 
@@ -56,7 +56,13 @@ mkdir build
 cd build
 cmake -DCMAKE_PREFIX_PATH=relative/path/to/lib/pnl/build/ ..
 make
-./nomExecutable args
+```
+
+- **Execution:**
+
+```bash
+./price0 data_input.json
+./hedge market_file.txt data_input.json
 ```
 
 -   **configuration vscode:**
