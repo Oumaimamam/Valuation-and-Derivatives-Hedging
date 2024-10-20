@@ -28,7 +28,10 @@ $$
 L'estimation par Monte Carlo de cette quantité mène à la formule du prix de l'option :
 
 $$
-e^{-r(T - t)} \frac{1}{M} \sum_{j=1}^{M} \rho(s_{t_0}, s_{t_1}, \dots, s_{t_i}, s_t \tilde{S}_{t_{i+1}-t}^{(j)}, \dots, s_t \tilde{S}_{t_N - t}^{(j)})
+e^{-r(T - t)} \frac{1}{M} \sum_{j=1}^{M} \rho(s_{t_0}, s_{t_1}
+$$
+$$
+, \dots, s_{t_i}, s_t \tilde{S}_{t_{i+1}-t}^{(j)}, \dots, s_t \tilde{S}_{t_N - t}^{(j)})
 $$
 
 
